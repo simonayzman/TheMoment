@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -14,25 +13,24 @@ const purchasables  = [
   {
     description: "Something Cool",
     price: 100,
-    image: require('./images/clock.png')
+    image: require('./assets/clock.png')
   },
   {
     description: "Hyper Mode",
     price: 300,
-    image: require('./images/stuff.png')
+    image: require('./assets/stuff.png')
   },
   {
     description: "Disable Social",
     price: 400,
-    image: require('./images/stuff.png')
+    image: require('./assets/stuff.png')
   },
   {
     description: "Premium Green Live Button",
     price: 500,
-    image: require('./images/stuff.png')
+    image: require('./assets/stuff.png')
   },
 ]
-
 
 const styles = StyleSheet.create({
   container: {
@@ -75,7 +73,7 @@ const styles = StyleSheet.create({
 });
 
 
-export class PurchaseStore extends Component {
+export default class PurchaseStore extends Component {
   onPress(e, item){
     console.log('PRESSED',e, item)
   }
@@ -99,20 +97,7 @@ export class PurchaseStore extends Component {
             </TouchableOpacity>
           );
         })}
-
-
-
-
       </View>
     );
   }
 }
-
-
-        // <TouchableOpacity onPress={this.onPress} style={styles.row}>
-        //   <Image style={styles.image} source={require('./images/stuff.png')} />
-        //   <Text style={styles.description}>Something Cool</Text>
-        //   <Text style={styles.price}>Buy for 1000 Moments</Text>
-        // </TouchableOpacity>
-
-// AppRegistry.registerComponent('TheMoment', () => TheMoment);
