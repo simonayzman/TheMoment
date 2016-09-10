@@ -50,4 +50,10 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('TheMoment', () => TheMoment);
+// Just for Dev, XXX remove and use router
+import {PurchaseStore} from './purchaseStore'
+// console.log('hello world')
+// console.log(PurchaseStore)
+
+AppRegistry.registerComponent('TheMoment', () => PurchaseStore);
+// AppRegistry.registerComponent('TheMoment', () => TheMoment);
