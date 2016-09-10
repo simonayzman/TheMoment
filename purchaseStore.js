@@ -37,16 +37,19 @@ const purchasables  = [
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 50
   },
   welcome: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+    marginBottom: 25,
+
   },
   instructions: {
     textAlign: 'center',
     color: '#333333',
-    marginBottom: 5,
+    marginBottom: 25,
   },
   row: {
     flexDirection: "row",
@@ -60,8 +63,9 @@ const styles = StyleSheet.create({
   },
   price: {
     flex: 1,
-    backgroundColor: 'lightgray',
-    padding: 20
+    backgroundColor: '#827FB2',
+    padding: 20,
+    textAlign: 'center'
   },
   image: {
     width: 50,
@@ -80,10 +84,10 @@ export class PurchaseStore extends Component {
       <View style={styles.container}>
 
         <Text style={styles.welcome}>
-          Welcome to The Moment Store
+          Welcome to the Moment Store!
         </Text>
         <Text style={styles.instructions}>
-          These are some instructions
+          Spend your moments wisely.
         </Text>
 
         {purchasables.map((item, i)=> {
