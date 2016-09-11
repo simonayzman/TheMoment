@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import keyMirror from 'keymirror';
-import { BlurView } from 'react-native-blur';
+
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
