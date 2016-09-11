@@ -14,6 +14,7 @@ import * as actions from '../redux/actions';
 
 import MainPage from './MainPage';
 import PurchaseStore from './PurchaseStore';
+import StoryPage from './StoryPage';
 
 const RouterWithRedux = connect()(Router);
 
@@ -25,6 +26,7 @@ class TheMoment extends Component {
         <Scene key="root">
           <Scene key={'mainPage'} component={MainPage} title='Live in the Moment!' hideNavBar initial/>
           <Scene key={'storePage'} component={PurchaseStore} title="Shop in the Moment!" hideNavBar={false} />
+          <Scene key={'storyPage'} component={StoryPage} title="View Stories!" hideNavBar={false} />
         </Scene>
       </RouterWithRedux>
     );
