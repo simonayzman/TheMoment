@@ -30,13 +30,15 @@ import storyPage from '../assets/people-icon.png';
 import {dontThinkList} from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
+import AdModal from './AdModal';
 
 const VIBRATION_INTERVAL = 8000;
+
 const LIVE_INTERVAL = 3000;
 
-import {main_page_styles} from "../lib/styles"
-const styles = main_page_styles
 
+import { main_page_styles } from "../lib/styles"
+const styles = main_page_styles;
 
 class MainPage extends Component {
   static propTypes = {
@@ -56,6 +58,7 @@ class MainPage extends Component {
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
       isReady: true,
+      shouldAdDisplay: false,
     };
     this.liveGrowValue = new Animated.Value(1);
     this.momentCountGrowValue = new Animated.Value(1);
@@ -69,7 +72,7 @@ class MainPage extends Component {
     const { momentCount } = props;
     LayoutAnimation.spring();
     // Rules for annoying stuff
-    if (momentCount == 0) {
+    if (momentCount === 0) {
       return;
     }
     if (momentCount % 3 == 0) {
@@ -88,6 +91,9 @@ class MainPage extends Component {
     else if (momentCount>1) {
       this.setState({achievement_message:'', achievement_title:'' })
     }
+    this.setState({
+      shouldAdDisplay: momentCount % 8 === 0,
+    });
   }
 
   componentWillUnmount() {
@@ -152,7 +158,6 @@ class MainPage extends Component {
     }
   }
 
-
   renderTopMessage() {
     let ach_bar = (this.state.achievement_message ? <View style={styles.topMessageContainer}>
         <Text style={styles.topMessageTitleText}>🏆 {this.state.achievement_title}</Text>
@@ -177,7 +182,7 @@ class MainPage extends Component {
         <View></View>
       );
     }
-    return <View>{ach_bar}{dontThink}</View>
+    return <View>{ach_bar}{dontThink}</View>;
   }
 
   renderLive() {
@@ -252,6 +257,11 @@ class MainPage extends Component {
           {this.renderLive()}
           {this.renderBottomBar()}
         </View>
+
+        <AdModal
+          shouldDisplay={this.state.shouldAdDisplay}
+          onDismiss={ () => { this.setState({shouldAdDisplay: false}); } }
+        />
 
       </View>
     );
