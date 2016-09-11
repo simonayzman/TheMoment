@@ -24,7 +24,7 @@ class TheMoment extends Component {
       <RouterWithRedux>
         <Scene key="root">
           <Scene key={'mainPage'} component={MainPage} title='Live in the Moment!' hideNavBar initial/>
-          <Scene key={'storePage'} component={PurchaseStore} title="Shop in the Moment!"  />
+          <Scene key={'storePage'} component={PurchaseStore} title="Shop in the Moment!" hideNavBar={false} />
         </Scene>
       </RouterWithRedux>
     );
