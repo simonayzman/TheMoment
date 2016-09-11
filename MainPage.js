@@ -127,6 +127,7 @@ class MainPage extends Component {
   static propTypes = {
     momentCount: PropTypes.number.isRequired,
     actions: PropTypes.shape({
+      updateMomentsFromCache: PropTypes.func.isRequired,
       liveInTheMoment: PropTypes.func.isRequired,
       resetMoments: PropTypes.func.isRequired,
       bulkAddMoments: PropTypes.func.isRequired,
@@ -150,6 +151,7 @@ class MainPage extends Component {
     // This MessageBar will be accessible from the current (same) component, and from its child component
     // The MessageBar is then declared only once, in your main component.
     MessageBarManager.registerMessageBar(this.refs.alert);
+    this.props.actions.updateMomentsFromCache();
   }
 
   componentWillUnmount() {
