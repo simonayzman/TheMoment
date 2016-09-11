@@ -14,6 +14,7 @@ import {
   Dimensions,
   PushNotificationIOS,
   LayoutAnimation,
+  Alert
 } from 'react-native';
 import keyMirror from 'keymirror';
 import { Actions } from 'react-native-router-flux';
@@ -30,117 +31,13 @@ import momentShop from '../assets/moment-shop.png';
 import getRandomDontThink from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
-import MomentNotification from './MomentNotification';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 const VIBRATION_INTERVAL = 5000;
 const LIVE_INTERVAL = 1000;
-const LIVE_BUTTON_SIZE = 250;
 
-const styles = StyleSheet.create({
-  topLevelContainer: {
-    flex: 1,
-    backgroundColor: '#ffffe6',
-    justifyContent: 'space-between',
-  },
-  topMessageContainer: {
-    marginTop: 60,
-    alignItems: 'center',
-  },
-  topMessageTitleText: {
-    fontSize: 40,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  topMessageSubtitleText: {
-    fontSize: 45,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  welcomeMessageText: {
-    color: '#18309d',
-  },
-  dontThinkAboutTitleText: {
-    color: 'red',
-  },
-  dontThinkAboutSubtitleText: {
-    color: '#18309d',
-  },
-  centerContainer: {
-    position: 'absolute',
-    top: (SCREEN_HEIGHT - LIVE_BUTTON_SIZE) / 2 + 100,
-    left: (SCREEN_WIDTH - LIVE_BUTTON_SIZE) / 2,
-  },
-  liveCircle: {
-    backgroundColor: '#439cba',
-    width: LIVE_BUTTON_SIZE,
-    height: LIVE_BUTTON_SIZE,
-    borderRadius: LIVE_BUTTON_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: "#000000",
-    shadowOpacity: 0.8,
-    shadowRadius: 5,
-    shadowOffset: {
-      height: 1,
-      width: 0
-    }
-  },
-  notReadyLiveCircle: {
-    backgroundColor: '#ff0000',
-  },
-  readyLiveCircle: {
-    backgroundColor: '#439cba',
-  },
-  liveText: {
-    color: '#18309d',
-    fontSize: 80,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  readyLiveText: {
-    color: '#18309d',
-  },
-  notReadyLiveText: {
-    color: '#dddddd',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  momentsCounterContainer: {
-    margin: 10,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  momentsCounterText: {
-    fontSize: 30,
-    color: '#18309d',
-    fontFamily: 'IowanOldStyle-Bold',
-  },
-  momentsCounterNumberText: {
-    fontSize: 30,
-    color: '#18309d',
-    textAlign: 'left',
-    fontFamily: 'IowanOldStyle-Bold',
-  },
-  momentShopContainer: {
-    justifyContent: 'center',
-  },
-  momentShopImage: {
-    width: 65,
-    height: 65,
-    padding: 5,
-  },
-});
+import {main_page_styles} from "../lib/styles"
+const styles = main_page_styles
 
-const MomentNotificationType = keyMirror({
-  NONE: null,
-  COME_BACK: null,
-  ACHIEVEMENT_GREEN: null,
-  ACHIEVEMENT_ORANGE: null,
-});
 
 const TopMessageType = keyMirror({
   WELCOME: null,
@@ -148,7 +45,6 @@ const TopMessageType = keyMirror({
 });
 
 class MainPage extends Component {
-
   static propTypes = {
     momentCount: PropTypes.number.isRequired,
     actions: PropTypes.shape({
@@ -162,7 +58,6 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      momentNotificationType: MomentNotificationType.NONE,
       topMessageType: TopMessageType.WELCOME,
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
@@ -173,141 +68,57 @@ class MainPage extends Component {
   }
 
   componentWillMount() {
-    PushNotificationIOS.addEventListener('register', this.onRegistered);
-    PushNotificationIOS.addEventListener('notification', this.onRemoteNotification);
-    PushNotificationIOS.addEventListener('localNotification', this.onLocalNotification);
-    PushNotificationIOS.requestPermissions();
-    PushNotificationIOS.cancelAllLocalNotifications();
+
   }
 
   componentWillReceiveProps(props) {
     const { momentCount } = props;
     LayoutAnimation.spring();
-
+    // TODO move to reducer
     // Rules for annoying stuff
     if (momentCount == 0) {
       return;
     }
     if (momentCount === 1) {
-      this.showFirstMomentAlert();
+      this.setState({achievement_title:"Your First Moment", achievement_message:"You're well on your way to living in The Moment"})
     }
     if (momentCount % 3 == 0) {
       this.setState({
-        topMessageType: TopMessageType.DONT_THINK,
         dontThink: getRandomDontThink(),
       });
     }
+    else {
+      this.setState({ dontThink: ''});
+    }
     let achievement = getAchievementForMomentCount(momentCount);
     if (achievement) {
-      this.showIntervalMomentsAlert(momentCount, achievement);
+      this.setState({achievement_title:achievement, achievement_message:`Congratulations on living in ${momentCount} moments!` })
+    }
+    else if (momentCount>1) {
+      this.setState({achievement_message:'', achievement_title:'' })
     }
   }
 
   componentWillUnmount() {
-    MessageBarManager.unregisterMessageBar();
-    PushNotificationIOS.removeEventListener('register', this.onRegistered);
-    PushNotificationIOS.removeEventListener('notification', this.onRemoteNotification);
-    PushNotificationIOS.removeEventListener('localNotification', this.onLocalNotification);
-    console.log('Unmounting the main page. Scheduling push notification');
-    this.scheduleLiveInTheMomentNotification();
+    // MessageBarManager.unregisterMessageBar();
   }
 
   componentDidMount() {
-    MessageBarManager.registerMessageBar(this.refs.alert);
+    // MessageBarManager.registerMessageBar(this.refs.alert);
     this.props.actions.updateMomentsFromCache();
     this.scheduleNoLivingVibration();
   }
 
-  sendNotification = () => {
-    require('RCTDeviceEventEmitter').emit('remoteNotificationReceived', {
-      aps: {
-        alert: 'Sample notification',
-        badge: '+1',
-        sound: 'default',
-        category: 'REACT_NATIVE',
-      },
-    });
-  }
-
-  sendLocalNotification = () => {
-    require('RCTDeviceEventEmitter').emit('localNotificationReceived', {
-      aps: {
-        alert: 'Sample local notification',
-        badge: '+1',
-        sound: 'default',
-        category: 'REACT_NATIVE',
-      },
-    });
-  }
-
-  scheduleLiveInTheMomentNotification = () => {
-    PushNotificationIOS.scheduleLocalNotification({
-      fireDate: Date()+4000,
-      alertBody: 'You\'re not living in the Moment!',
-      alertAction: 'Live in the Moment',
-      soundName: 'default',
-      // category: ,
-      // userInfo: ,
-      applicationIconBadgeNumber: 0,
-    });
-  }
-
-  onRegistered = (deviceToken) => {
-    console.log("Device registered.");
-    /*
-    AlertIOS.alert(
-      'Registered For Remote Push',
-      `Device Token: ${deviceToken}`,
-      [
-        { text: 'Dismiss', onPress: null, }
-      ],
-    );
-    */
-  }
-
-  onRemoteNotification = (notification) => {
-    console.log("On remote notification.");
-    /*
-    AlertIOS.alert(
-      'Push Notification Received',
-      'Alert message: ' + notification.getMessage(),
-      [
-        {
-          text: 'Dismiss',
-          onPress: null,
-        },
-      ],
-    );
-    */
-  }
-
-  onLocalNotification = (notification) => {
-    console.log("On local notification.");
-    /*
-    AlertIOS.alert(
-      'Local Notification Received',
-      'Alert message: ' + notification.getMessage(),
-      [
-        {
-          text: 'Dismiss',
-          onPress: null,
-        },
-      ],
-    );
-    */
-  }
 
   scheduleNoLivingVibration = () => {
     if (this.vibrateTimeoutID) {
       this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
     this.vibrateTimeoutID = this.setInterval(() => {
-      Vibration.vibrate(); 
-      MessageBarManager.showAlert({
-        title: "You're not living in the Moment!",
-        message: "LIVE IN THE MOMENT",
-        alertType: 'error', // Looks like how we want it
-      });
+      // only do this if we've already lived some moments
+      if (this.props.momentCount<4){return}
+      Vibration.vibrate();
+      Alert.alert('Live in The Moment!',  "You don't seem to be living in The Moment right now.")
     }, VIBRATION_INTERVAL);
   }
 
@@ -351,100 +162,15 @@ class MainPage extends Component {
     }
   }
 
-  showFirstMomentAlert() {
-
-    MessageBarManager.showAlert({
-      title: 'Your first moment!',
-      message: "You're well on your way to being in the moment.",
-      alertType: 'success',
-    });
-    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
-    /*
-    this.setState({
-      momentNotificationType: MomentNotificationType.ACHIEVEMENT_GREEN,
-    });
-    */
-  }
-
-  showIntervalMomentsAlert(momentCount, achievement) {
-
-    MessageBarManager.showAlert({
-      title: `Congratulations on living in ${momentCount} moments!`,
-      message: achievement,
-      alertType: 'warning', // Looks like how we want it
-    });
-    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
-    /*
-    this.setState({
-      momentNotificationType: MomentNotificationType.ACHIEVEMENT_ORANGE,
-    });
-    */
-  }
-
-  // Perhaps not necessary if we can get MessageBarManager working
-  renderMomentNotification() {
-    if (this.state.momentNotificationType === MomentNotificationType.NONE) {
-      return (
-        <View />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.COME_BACK) {
-      return (
-        <MomentNotification
-          backgroundColor={'red'}
-          textColor={'black'}
-          title={'Come back!'}
-          subtitle={"You're not living in the moment"}
-        />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_GREEN) {
-      return (
-        <MomentNotification
-          backgroundColor={'green'}
-          textColor={'black'}
-          title={'Congratulations!'}
-          subtitle={`You've reached ${this.props.momentCount} moments!`}
-        />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_ORANGE) {
-      return (
-        <MomentNotification
-          backgroundColor={'orange'}
-          textColor={'black'}
-          title={'Congratulations!'}
-          subtitle={`You've reached ${this.props.momentCount} moments!`}
-        />
-      );
-    }
-  }
 
   renderTopMessage() {
-    if (this.state.topMessageType === TopMessageType.WELCOME) {
-      return (
-        <View style={styles.topMessageContainer}>
-          <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
-            Welcome to
-          </Text>
-          <Text style={[styles.topMessageSubtitleText, styles.welcomeMessageText]}>
-            THE MOMENT
-          </Text>
-        </View>
-      );
-    }
-    else if (this.state.topMessageType === TopMessageType.DONT_THINK) {
-      return (
-        <View style={styles.topMessageContainer}>
-          <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
-            {"Don't Think About"}
-          </Text>
-          <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
-            {this.state.dontThink}
-          </Text>
-        </View>
-      );
-    }
+    let ach_bar = (this.state.achievement_message ? <View style={styles.topMessageContainer}>
+        <Text style={styles.topMessageTitleText}>🏆 {this.state.achievement_title}</Text>
+        <Text style={styles.topMessageSubtitleText}>{this.state.achievement_message}</Text>
+      </View> : <View></View>)
+    console.log(this.state.dontThink )
+    let dontThink = (this.state.dontThink ? <View style={{marginTop:50}}><Text style={styles.dontThinkAboutTitleText}>Don't think about {this.state.dontThink}</Text></View> : <View></View>)
+    return <View>{ach_bar}{dontThink}</View>
   }
 
   renderLive() {
@@ -471,7 +197,7 @@ class MainPage extends Component {
         >
           <View style={styles.momentsCounterContainer}>
             <Text style={styles.momentsCounterText}>
-              {'Moments: '}
+              {'MOMENTS: '}
             </Text>
             <Animated.Text
               style={[styles.momentsCounterNumberText, { transform: [{
@@ -501,6 +227,7 @@ class MainPage extends Component {
   render() {
     return (
       <View style={{flex: 1}}>
+      <View style={styles.bgwrap}><Image source={require('../assets/bg.jpg')} style={styles.bg} /></View>
         <View style={styles.topLevelContainer}>
           {this.renderTopMessage()}
           {this.renderLive()}
