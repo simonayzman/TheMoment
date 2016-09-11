@@ -32,108 +32,12 @@ import getAchievementForMomentCount from '../data/achievements';
 
 import MomentNotification from './MomentNotification';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 const VIBRATION_INTERVAL = 5000;
 const LIVE_INTERVAL = 1000;
-const LIVE_BUTTON_SIZE = 250;
 
-const styles = StyleSheet.create({
-  topLevelContainer: {
-    flex: 1,
-    backgroundColor: '#ffffe6',
-    justifyContent: 'space-between',
-  },
-  topMessageContainer: {
-    marginTop: 60,
-    alignItems: 'center',
-  },
-  topMessageTitleText: {
-    fontSize: 40,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  topMessageSubtitleText: {
-    fontSize: 45,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  welcomeMessageText: {
-    color: '#18309d',
-  },
-  dontThinkAboutTitleText: {
-    color: 'red',
-  },
-  dontThinkAboutSubtitleText: {
-    color: '#18309d',
-  },
-  centerContainer: {
-    position: 'absolute',
-    top: (SCREEN_HEIGHT - LIVE_BUTTON_SIZE) / 2 + 100,
-    left: (SCREEN_WIDTH - LIVE_BUTTON_SIZE) / 2,
-  },
-  liveCircle: {
-    backgroundColor: '#439cba',
-    width: LIVE_BUTTON_SIZE,
-    height: LIVE_BUTTON_SIZE,
-    borderRadius: LIVE_BUTTON_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: "#000000",
-    shadowOpacity: 0.8,
-    shadowRadius: 5,
-    shadowOffset: {
-      height: 1,
-      width: 0
-    }
-  },
-  notReadyLiveCircle: {
-    backgroundColor: '#ff0000',
-  },
-  readyLiveCircle: {
-    backgroundColor: '#439cba',
-  },
-  liveText: {
-    color: '#18309d',
-    fontSize: 80,
-    fontFamily: 'IowanOldStyle-Bold',
-    textAlign: 'center',
-  },
-  readyLiveText: {
-    color: '#18309d',
-  },
-  notReadyLiveText: {
-    color: '#dddddd',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  momentsCounterContainer: {
-    margin: 10,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  momentsCounterText: {
-    fontSize: 30,
-    color: '#18309d',
-    fontFamily: 'IowanOldStyle-Bold',
-  },
-  momentsCounterNumberText: {
-    fontSize: 30,
-    color: '#18309d',
-    textAlign: 'left',
-    fontFamily: 'IowanOldStyle-Bold',
-  },
-  momentShopContainer: {
-    justifyContent: 'center',
-  },
-  momentShopImage: {
-    width: 65,
-    height: 65,
-    padding: 5,
-  },
-});
+import {main_styles} from "../lib/styles"
+
+const styles = main_styles
 
 const MomentNotificationType = keyMirror({
   NONE: null,
@@ -148,7 +52,6 @@ const TopMessageType = keyMirror({
 });
 
 class MainPage extends Component {
-
   static propTypes = {
     momentCount: PropTypes.number.isRequired,
     actions: PropTypes.shape({
@@ -302,7 +205,7 @@ class MainPage extends Component {
       this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
     this.vibrateTimeoutID = this.setInterval(() => {
-      Vibration.vibrate(); 
+      Vibration.vibrate();
       MessageBarManager.showAlert({
         title: "You're not living in the Moment!",
         message: "LIVE IN THE MOMENT",
