@@ -80,7 +80,7 @@ class MainPage extends Component {
       return;
     }
     if (momentCount === 1) {
-      this.showFirstMomentAlert();
+      this.setState({achievement_title:"Your First Moment", achievement_message:"You're well on your way to living in The Moment"})
     }
     if (momentCount % 3 == 0) {
       this.setState({
@@ -89,7 +89,10 @@ class MainPage extends Component {
     }
     let achievement = getAchievementForMomentCount(momentCount);
     if (achievement) {
-      this.showIntervalMomentsAlert(momentCount, achievement);
+      this.setState({achievement_title:achievement, achievement_message:`Congratulations on living in ${momentCount} moments!` })
+    }
+    else if (momentCount>1) {
+      this.setState({achievement_message:'', achievement_title:'' })
     }
   }
 
@@ -156,60 +159,18 @@ class MainPage extends Component {
     }
   }
 
-  showFirstMomentAlert() {
-    this.setState({achievement_message:"You're well on your way to being in The Moment."})
-    // MessageBarManager.showAlert({
-    //   duration: 4000,
-    //   title: 'Your first moment!',
-    //   message: "You're well on your way to being in the moment.",
-    //   position: 'bottom',
-    //   animationType: 'SlideFromLeft',
-    // });
-  }
 
-  showIntervalMomentsAlert(momentCount, achievement) {
-    this.setState({achievement_message:achievement})
-    // MessageBarManager.showAlert({
-    //   title: `Congratulations on living in ${momentCount} moments!`,
-    //   message: achievement,
-    //   alertType: 'warning', // Looks like how we want it
-    //   duration: 4000,
-    // });
-
-
-  }
 
 
 
   renderTopMessage() {
-    console.log(this.props.momentCount)
-    return (<View>
-        <Text>{this.state.achievement_message}</Text>
-      </View>)
-    // if (this.state.topMessageType === TopMessageType.WELCOME) {
-    //   return (
-    //     <View style={styles.topMessageContainer}>
-    //       <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
-    //         Welcome to
-    //       </Text>
-    //       <Text style={[styles.topMessageSubtitleText, styles.welcomeMessageText]}>
-    //         THE MOMENT
-    //       </Text>
-    //     </View>
-    //   );
-    // }
-    // else if (this.state.topMessageType === TopMessageType.DONT_THINK) {
-    //   return (
-    //     <View style={styles.topMessageContainer}>
-    //       <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
-    //         {"Don't Think About"}
-    //       </Text>
-    //       <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
-    //         {this.state.dontThink}
-    //       </Text>
-    //     </View>
-    //   );
-    // }
+    console.log('rendertop')
+    console.log(this.state)
+    // console.log(this.props.momentCount)
+    return (this.state.achievement_message ? <View style={styles.topMessageContainer}>
+        <Text style={styles.topMessageTitleText}>🏆{this.state.achievement_title}</Text>
+        <Text style={styles.topMessageSubtitleText}>{this.state.achievement_message}</Text>
+      </View> : <View></View>)
   }
 
   renderLive() {
