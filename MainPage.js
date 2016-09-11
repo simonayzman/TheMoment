@@ -11,7 +11,9 @@ import {
   Animated,
   Image,
   Vibration,
+  Dimensions,
 } from 'react-native';
+import keyMirror from 'keymirror';
 import { Actions } from 'react-native-router-flux';
 import * as Animatable from 'react-native-animatable';
 import TimerMixin from 'react-timer-mixin';
@@ -23,11 +25,20 @@ import { bindActionCreators } from 'redux';
 import * as actions from './actions';
 
 import momentShop from './assets/moment-shop.png';
+import getRandomDontThink from './dontThink';
+import getAchievementForMomentCount from './achievements';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const VIBRATION_INTERVAL = 10000;
+const LIVE_INTERVAL = 500;
+const LIVE_BUTTON_SIZE = 250;
 
 const styles = StyleSheet.create({
   topLevelContainer: {
     flex: 1,
     backgroundColor: '#ffffe6',
+    justifyContent: 'space-between',
   },
   topMessageContainer: {
     marginTop: 60,
@@ -53,16 +64,15 @@ const styles = StyleSheet.create({
     color: '#18309d',
   },
   centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    alignItems: 'center',
+    position: 'absolute',
+    top: (SCREEN_HEIGHT - LIVE_BUTTON_SIZE) / 2 + 100,
+    left: (SCREEN_WIDTH - LIVE_BUTTON_SIZE) / 2,
   },
   liveCircle: {
     backgroundColor: '#439cba',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    width: LIVE_BUTTON_SIZE,
+    height: LIVE_BUTTON_SIZE,
+    borderRadius: LIVE_BUTTON_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: "#000000",
@@ -121,6 +131,10 @@ const styles = StyleSheet.create({
   },
 });
 
+const TopMessageType = keyMirror({
+  WELCOME: null,
+  DONT_THINK: null,
+});
 
 class MainPage extends Component {
 
@@ -137,7 +151,7 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      topMessageType: 'welcome',
+      topMessageType: TopMessageType.WELCOME,
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
       isReady: true,
@@ -147,15 +161,33 @@ class MainPage extends Component {
   }
 
   componentDidMount() {
-    // Register the alert located on this master page
-    // This MessageBar will be accessible from the current (same) component, and from its child component
-    // The MessageBar is then declared only once, in your main component.
     MessageBarManager.registerMessageBar(this.refs.alert);
     this.props.actions.updateMomentsFromCache();
   }
 
+  componentWillReceiveProps(props) {
+    const { momentCount } = props;
+
+    // Rules for annoying stuff
+    if (momentCount == 0) {
+      return;
+    }
+    if (momentCount === 1) {
+      this.showFirstMomentAlert();
+    }
+    if (momentCount % 3 == 0) {
+      this.setState({
+        topMessageType: TopMessageType.DONT_THINK,
+        dontThink: getRandomDontThink(),
+      });
+    }
+    let achievement = getAchievementForMomentCount(momentCount);
+    if (achievement) {
+      this.showIntervalMomentsAlert(momentCount, achievement);
+    }
+  }
+
   componentWillUnmount() {
-    // Remove the alert located on this master page from the manager
     MessageBarManager.unregisterMessageBar();
   }
 
@@ -163,7 +195,7 @@ class MainPage extends Component {
     if (this.vibrateTimeoutID) {
       this.clearTimeout(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
-    this.vibrateTimeoutID = this.setTimeout(Vibration.vibrate, 10000);
+    this.vibrateTimeoutID = this.setTimeout(Vibration.vibrate, VIBRATION_INTERVAL);
   }
 
   onResetReadyTimeout = () => {
@@ -176,7 +208,7 @@ class MainPage extends Component {
         liveText: [styles.liveText, styles.readyLiveText],
         isReady: true,
       });
-    }, 2500);
+    }, LIVE_INTERVAL);
   }
 
   onResetReadyLiveCircle = () => {
@@ -190,7 +222,7 @@ class MainPage extends Component {
     });
     Animated.sequence([
       Animated.spring(this.liveGrowValue, { toValue: 0.7 }),
-      Animated.timing(this.liveGrowValue, { toValue: 1.05, duration: 2000 }),
+      Animated.timing(this.liveGrowValue, { toValue: 1.05, duration: LIVE_INTERVAL - 500 }),
       Animated.spring(this.liveGrowValue, { toValue: 1, friction: 1 }),
     ]).start();
   }
@@ -203,7 +235,6 @@ class MainPage extends Component {
       ]).start();
       this.onResetReadyLiveCircle();
       this.props.actions.liveInTheMoment();
-      this.showFirstMomentAlert();
     }
   }
 
@@ -216,8 +247,17 @@ class MainPage extends Component {
     this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
   }
 
+  showIntervalMomentsAlert(momentCount, achievement) {
+    MessageBarManager.showAlert({
+      title: `Congratulations on living in ${momentCount} moments!`,
+      message: achievement,
+      alertType: 'warning',
+    });
+    this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
+  }
+
   renderTopMessage() {
-    if (this.state.topMessageType === 'welcome') {
+    if (this.state.topMessageType === TopMessageType.WELCOME) {
       return (
         <View style={styles.topMessageContainer}>
           <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
@@ -229,14 +269,14 @@ class MainPage extends Component {
         </View>
       );
     }
-    else if (this.state.topMessageType === 'dontThinkAbout') {
+    else if (this.state.topMessageType === TopMessageType.DONT_THINK) {
       return (
         <View style={styles.topMessageContainer}>
           <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
             {"Don't Think About"}
           </Text>
-          <Text type={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
-            {"THE MOMENT"}
+          <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
+            {this.state.dontThink}
           </Text>
         </View>
       );
