@@ -35,9 +35,8 @@ import MomentNotification from './MomentNotification';
 const VIBRATION_INTERVAL = 5000;
 const LIVE_INTERVAL = 1000;
 
-import {main_styles} from "../lib/styles"
-
-const styles = main_styles
+import {main_page_styles} from "../lib/styles"
+const styles = main_page_styles
 
 const MomentNotificationType = keyMirror({
   NONE: null,
