@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   h1: {
-    fontSize: 45,
+    fontSize: 55,
     textAlign: 'center',
     margin: 10,
     marginBottom: 25,
