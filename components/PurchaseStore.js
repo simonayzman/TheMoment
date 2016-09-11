@@ -11,69 +11,78 @@ import {
 
 const purchasables  = [
   {
-    description: "Something Cool",
-    price: 100,
-    image: require('../assets/clock.png')
+    description: "Luxury Button",
+    price: 200,
   },
   {
-    description: "Hyper Mode",
+    description: "Namaste Mode",
     price: 300,
-    image: require('../assets/stuff.png')
   },
   {
-    description: "Disable Social",
-    price: 400,
-    image: require('../assets/stuff.png')
+    description: "Beach Soundscape",
+    price: 900,
   },
   {
-    description: "Premium Green Live Button",
-    price: 500,
-    image: require('../assets/stuff.png')
+    description: "Button V-Neck",
+    price: 1000,
+  },
+  {
+    description: "Countdown Timer",
+    price: 1000,
+  },
+  {
+    description: "Enlightenment \n(Flashlight Mode)",
+    price: 10000,
   },
 ]
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50
+    marginTop: 60,
+    backgroundColor: '#131B33',
   },
-  welcome: {
-    fontSize: 20,
+  h2: {
+    fontSize: 25,
     textAlign: 'center',
     margin: 10,
     marginBottom: 25,
-
+    fontFamily:'Avenir',
+    color: 'white',
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 25,
+  title: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#A2A0A7',
   },
   row: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: 'gray',
-
+    borderBottomColor: '#A2A0A7',
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   description: {
     flex: 2,
-    padding: 20
+    padding: 20,
+    fontSize: 17,
+    color: 'white',
+    fontFamily:'Avenir',
   },
   price: {
     flex: 1,
-    backgroundColor: '#827FB2',
     padding: 20,
-    textAlign: 'center'
+    fontSize: 17,
+    textAlign: 'right',
+    color: 'white',
+    fontFamily:'Avenir',
   },
-  image: {
-    width: 50,
-    height: 50,
-    margin: 20
-  }
 });
 
 
 export default class PurchaseStore extends Component {
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   onPress(e, item){
     console.log('PRESSED',e, item)
   }
@@ -81,19 +90,18 @@ export default class PurchaseStore extends Component {
     return (
       <View style={styles.container}>
 
-        <Text style={styles.welcome}>
-          Welcome to the Moment Store!
-        </Text>
-        <Text style={styles.instructions}>
-          Spend your moments wisely.
-        </Text>
+        <View style={styles.title}>
+          <Text style={styles.h2}>
+            {'Store'.toUpperCase()}
+          </Text>
+        </View>
 
         {purchasables.map((item, i)=> {
           return(
             <TouchableOpacity key={i} onPress={e=>this.onPress(e, item)} style={styles.row}>
               <Image style={styles.image} source={item.image} />
-              <Text style={styles.description}>{item.description}</Text>
-              <Text style={styles.price}>Buy for {item.price} Moments</Text>
+              <Text style={styles.description}>{item.description.toUpperCase()}</Text>
+              <Text style={styles.price}>{this.numberWithCommas(item.price)}</Text>
             </TouchableOpacity>
           );
         })}

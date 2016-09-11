@@ -40,10 +40,11 @@ const styles = StyleSheet.create({
     fontSize: 25,
     textAlign: 'center',
     margin: 10,
-    marginBottom: 25,
     fontFamily:'Avenir',
     color: 'white',
-    borderBottomWidth: 1,
+  },
+  title: {
+    borderBottomWidth: 2,
     borderBottomColor: '#A2A0A7',
   },
   row: {
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    fontFamily:'Avenir-Light',
+    fontFamily:'Avenir',
     color: 'white',
     flex: 1.5,
     fontWeight: 'bold',
@@ -83,9 +84,11 @@ export default class StoryPage extends Component {
     return (
       <View style={styles.container}>
 
-        <Text style={styles.h2}>
-          {'Stories'.toUpperCase()}
-        </Text>
+        <View style={styles.title}>
+          <Text style={styles.h2}>
+            {'Stories'.toUpperCase()}
+          </Text>
+        </View>
 
         {stories.map((item, i)=> {
           return(
