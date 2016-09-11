@@ -287,7 +287,7 @@ class MainPage extends Component {
         >
           <View style={styles.momentsCounterContainer}>
             <Text style={styles.momentsCounterText}>
-              {'Moments: '}
+              {'MOMENTS: '}
             </Text>
             <Animated.Text
               style={[styles.momentsCounterNumberText, { transform: [{
@@ -317,6 +317,7 @@ class MainPage extends Component {
   render() {
     return (
       <View style={{flex: 1}}>
+      <View style={styles.bgwrap}><Image source={require('../assets/bg.jpg')} style={styles.bg} /></View>
         <View style={styles.topLevelContainer}>
           {this.renderTopMessage()}
           {this.renderLive()}
