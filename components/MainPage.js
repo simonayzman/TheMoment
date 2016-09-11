@@ -76,11 +76,7 @@ class MainPage extends Component {
   }
 
   componentWillMount() {
-    PushNotificationIOS.addEventListener('register', this.onRegistered);
-    PushNotificationIOS.addEventListener('notification', this.onRemoteNotification);
-    PushNotificationIOS.addEventListener('localNotification', this.onLocalNotification);
-    PushNotificationIOS.requestPermissions();
-    PushNotificationIOS.cancelAllLocalNotifications();
+
   }
 
   componentWillReceiveProps(props) {
@@ -108,11 +104,7 @@ class MainPage extends Component {
 
   componentWillUnmount() {
     MessageBarManager.unregisterMessageBar();
-    PushNotificationIOS.removeEventListener('register', this.onRegistered);
-    PushNotificationIOS.removeEventListener('notification', this.onRemoteNotification);
-    PushNotificationIOS.removeEventListener('localNotification', this.onLocalNotification);
-    console.log('Unmounting the main page. Scheduling push notification');
-    this.scheduleLiveInTheMomentNotification();
+
   }
 
   componentDidMount() {
@@ -121,84 +113,6 @@ class MainPage extends Component {
     this.scheduleNoLivingVibration();
   }
 
-  sendNotification = () => {
-    require('RCTDeviceEventEmitter').emit('remoteNotificationReceived', {
-      aps: {
-        alert: 'Sample notification',
-        badge: '+1',
-        sound: 'default',
-        category: 'REACT_NATIVE',
-      },
-    });
-  }
-
-  sendLocalNotification = () => {
-    require('RCTDeviceEventEmitter').emit('localNotificationReceived', {
-      aps: {
-        alert: 'Sample local notification',
-        badge: '+1',
-        sound: 'default',
-        category: 'REACT_NATIVE',
-      },
-    });
-  }
-
-  scheduleLiveInTheMomentNotification = () => {
-    PushNotificationIOS.scheduleLocalNotification({
-      fireDate: Date()+4000,
-      alertBody: 'You\'re not living in the Moment!',
-      alertAction: 'Live in the Moment',
-      soundName: 'default',
-      // category: ,
-      // userInfo: ,
-      applicationIconBadgeNumber: 0,
-    });
-  }
-
-  onRegistered = (deviceToken) => {
-    console.log("Device registered.");
-    /*
-    AlertIOS.alert(
-      'Registered For Remote Push',
-      `Device Token: ${deviceToken}`,
-      [
-        { text: 'Dismiss', onPress: null, }
-      ],
-    );
-    */
-  }
-
-  onRemoteNotification = (notification) => {
-    console.log("On remote notification.");
-    /*
-    AlertIOS.alert(
-      'Push Notification Received',
-      'Alert message: ' + notification.getMessage(),
-      [
-        {
-          text: 'Dismiss',
-          onPress: null,
-        },
-      ],
-    );
-    */
-  }
-
-  onLocalNotification = (notification) => {
-    console.log("On local notification.");
-    /*
-    AlertIOS.alert(
-      'Local Notification Received',
-      'Alert message: ' + notification.getMessage(),
-      [
-        {
-          text: 'Dismiss',
-          onPress: null,
-        },
-      ],
-    );
-    */
-  }
 
   scheduleNoLivingVibration = () => {
     if (this.vibrateTimeoutID) {
@@ -270,12 +184,12 @@ class MainPage extends Component {
   }
 
   showIntervalMomentsAlert(momentCount, achievement) {
-
     MessageBarManager.showAlert({
       title: `Congratulations on living in ${momentCount} moments!`,
       message: achievement,
       alertType: 'warning', // Looks like how we want it
     });
+
     //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
     /*
     this.setState({
