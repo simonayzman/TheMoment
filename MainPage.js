@@ -5,173 +5,303 @@ import React, {
 import {
   StyleSheet,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   View,
   Text,
   Animated,
+  Image,
+  Vibration,
 } from 'react-native';
-import {
-  Modal,
-  Router,
-  Scene,
-} from 'react-native-router-flux';
+import { Actions } from 'react-native-router-flux';
+import * as Animatable from 'react-native-animatable';
+import TimerMixin from 'react-timer-mixin';
+var MessageBarAlert = require('react-native-message-bar').MessageBar;
+var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from './actions';
-const RouterWithRedux = connect()(Router);
 
-import * as Animatable from 'react-native-animatable';
-import TimerMixin from 'react-timer-mixin';
+import momentShop from './assets/moment-shop.png';
 
 const styles = StyleSheet.create({
-  container: {
+  topLevelContainer: {
+    flex: 1,
+    backgroundColor: '#ffffe6',
+  },
+  topMessageContainer: {
+    marginTop: 60,
+    alignItems: 'center',
+  },
+  topMessageTitleText: {
+    fontSize: 40,
+    fontFamily: 'IowanOldStyle-Bold',
+    textAlign: 'center',
+  },
+  topMessageSubtitleText: {
+    fontSize: 45,
+    fontFamily: 'IowanOldStyle-Bold',
+    textAlign: 'center',
+  },
+  welcomeMessageText: {
+    color: '#18309d',
+  },
+  dontThinkAboutTitleText: {
+    color: 'red',
+  },
+  dontThinkAboutSubtitleText: {
+    color: '#18309d',
+  },
+  centerContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignSelf: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  liveButtonCircle: {
-    backgroundColor: 'blue',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+  liveCircle: {
+    backgroundColor: '#439cba',
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
+    shadowColor: "#000000",
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+    shadowOffset: {
+      height: 1,
+      width: 0
+    }
   },
-  liveButton: {
-    color: 'white',
-    fontSize: 18,
+  notReadyLiveCircle: {
+    backgroundColor: '#ff0000',
   },
-  notReadyLiveButton: {
-    color: 'gray',
-    fontSize: 24,
+  readyLiveCircle: {
+    backgroundColor: '#439cba',
   },
-  readyLiveButton: {
-    color: 'red',
-    fontSize: 36,
-  }
+  liveText: {
+    color: '#18309d',
+    fontSize: 80,
+    fontFamily: 'IowanOldStyle-Bold',
+    textAlign: 'center',
+  },
+  readyLiveText: {
+    color: '#18309d',
+  },
+  notReadyLiveText: {
+    color: '#dddddd',
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  momentsCounterContainer: {
+    margin: 10,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  momentsCounterText: {
+    fontSize: 30,
+    color: '#18309d',
+    fontFamily: 'IowanOldStyle-Bold',
+  },
+  momentsCounterNumberText: {
+    fontSize: 30,
+    color: '#18309d',
+    textAlign: 'left',
+    fontFamily: 'IowanOldStyle-Bold',
+  },
+  momentShopContainer: {
+    justifyContent: 'center',
+  },
+  momentShopImage: {
+    width: 50,
+    height: 50,
+    padding: 5,
+  },
 });
 
 
 class MainPage extends Component {
 
-/*
   static propTypes = {
+    momentCount: PropTypes.number.isRequired,
     actions: PropTypes.shape({
-      fetchSearchLandingPageNavigationItems: PropTypes.func.isRequired,
+      liveInTheMoment: PropTypes.func.isRequired,
     }).isRequired,
   };
-*/
 
   constructor(props) {
     super(props);
     this.state = {
-      bounceValue: new Animated.Value(0),
-      liveButtonStyle: styles.notReadyLiveButton,
+      topMessageType: 'welcome',
+      liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
+      liveText: [styles.liveText, styles.readyLiveText],
+      isReady: true,
     };
+    this.liveGrowValue = new Animated.Value(1);
+    this.momentCountGrowValue = new Animated.Value(1);
   }
-
-/*
-  this.state.bounceValue.setValue(1.5);  // Start large
-Animated.spring(  // Base: spring, decay, timing
-this.state.bounceValue,  // Animate `bounceValue`
-{ toValue: 0.8,  // Animate to smaller size
-friction: 1,  // Bouncier spring
-} ).start();
-
-<Animated.Text  // Base: Image, Text, View
-  style={{ transform: [{
-    scale: this.state.bounceValue,
-  }]}}
->
-  LIVE!
-</Animated.Text
-
-Animated.sequence([  // spring to start and twirl after decay finishes
-  Animated.decay(position, {  // coast to a stop
-    velocity: {x: gestureState.vx, y: gestureState.vy}, // velocity from gesture release
-    deceleration: 0.997, }),
-  Animated.parallel([  // after decay, in parallel:
-    Animated.spring(position, { toValue: {x: 0, y: 0} }),
-    Animated.timing(twirl, { toValue: 360, }), ]),
-  ])
-  .start();
-*/
 
   componentDidMount() {
+    // Register the alert located on this master page
+    // This MessageBar will be accessible from the current (same) component, and from its child component
+    // The MessageBar is then declared only once, in your main component.
+    MessageBarManager.registerMessageBar(this.refs.alert);
+  }
 
-    /*
-    if (this.throttleTimeoutID) {
-      this.clearTimeout(this.throttleTimeoutID); // Clear previous timer that would fire request
+  componentWillUnmount() {
+    // Remove the alert located on this master page from the manager
+    MessageBarManager.unregisterMessageBar();
+  }
+
+  onVibrationTimeout = () => {
+    if (this.vibrateTimeoutID) {
+      this.clearTimeout(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
-    this.readyToPressTimeoutID = this.setTimeout(
-      () => {
-        const hasQueryText = text.length > 0;
-
-        if (hasQueryText) {
-          this.props.onQuery(text);
-        } else if (this.props.onClear) {
-          this.props.onClear();
-        }
-
-        this.setState({ hasQueryText });
-      },
-      this.props.queryThrottle
-    );
-    */
+    this.vibrateTimeoutID = this.setTimeout(Vibration.vibrate, 10000);
   }
 
-  onRestartTransition = () => {
-
+  onResetReadyTimeout = () => {
+    if (this.resetReadyTimeoutID) {
+      this.clearTimeout(this.resetReadyTimeoutID); // Clear previous timer that would fire request
+    }
+    this.resetReadyTimeoutID = this.setTimeout(() => {
+      this.setState({
+        liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
+        liveText: [styles.liveText, styles.readyLiveText],
+        isReady: true,
+      });
+    }, 2500);
   }
 
-  onFillTransition = () => {
+  onResetReadyLiveCircle = () => {
+    this.onVibrationTimeout();
+    this.onResetReadyTimeout();
     this.setState({
-      liveButtonStyle: styles.readyLiveButton,
+      liveCircleStyle: [styles.liveCircle, styles.notReadyLiveCircle],
+      liveText: [styles.liveText, styles.notReadyLiveText],
+      isReady: false,
+      start: false,
     });
+    Animated.sequence([
+      Animated.spring(this.liveGrowValue, { toValue: 0.7 }),
+      Animated.timing(this.liveGrowValue, { toValue: 1.05, duration: 2000 }),
+      Animated.spring(this.liveGrowValue, { toValue: 1, friction: 1 }),
+    ]).start();
   }
 
-  onReadyTransition = () => {
-
+  liveInTheMoment = () => {
+    if (this.state.isReady) {
+      Animated.sequence([
+        Animated.spring(this.momentCountGrowValue, { toValue: 1.2, friction: 1}),
+        Animated.spring(this.momentCountGrowValue, { toValue: 1, friction: 1}),
+      ]).start();
+      this.onResetReadyLiveCircle();
+      this.props.actions.liveInTheMoment();
+      this.showFirstMomentAlert();
+    }
   }
 
-  onPressedTransition = () => {
-
+  showFirstMomentAlert() {
+    MessageBarManager.showAlert({
+      title: 'Your first moment!',
+      message: "You're well on your way to being in the moment.",
+      alertType: 'success',
+    });
+    this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
   }
 
-/*
-<Animatable.Text
-  ref="liveButton"
-  style={styles.liveButton}
-  animation="pulse"
-  easing="ease-out"
-  iterationCount="infinite"
->
-  LIVE!
-</Animatable.Text>
-*/
+  renderTopMessage() {
+    if (this.state.topMessageType === 'welcome') {
+      return (
+        <View style={styles.topMessageContainer}>
+          <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
+            Welcome to
+          </Text>
+          <Text style={[styles.topMessageSubtitleText, styles.welcomeMessageText]}>
+            THE MOMENT
+          </Text>
+        </View>
+      );
+    }
+    else if (this.state.topMessageType === 'dontThinkAbout') {
+      return (
+        <View style={styles.topMessageContainer}>
+          <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
+            {"Don't Think About"}
+          </Text>
+          <Text type={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
+            {"THE MOMENT"}
+          </Text>
+        </View>
+      );
+    }
+  }
 
-  render() {
+  renderLive() {
     return (
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={this.onFillTransition}>
-          <View style={styles.liveButtonCircle}>
-            <Animated.Text style={styles.liveButton}>
-              LIVE!
-            </Animated.Text>
-          </View>
-        </TouchableWithoutFeedback>
+      <View style={styles.centerContainer}>
+        <TouchableOpacity onPress={this.liveInTheMoment}>
+          <Animated.View style={[this.state.liveCircleStyle, { transform: [{
+              scale: this.liveGrowValue
+            }]}]}
+          >
+            <Text style={this.state.liveText}>LIVE</Text>
+          </Animated.View>
+        </TouchableOpacity>
       </View>
     );
   }
 
+  renderBottomBar() {
+    return (
+      <View style={styles.bottomBar}>
+        <View style={styles.momentsCounterContainer}>
+          <Text style={styles.momentsCounterText}>
+            {'Moments: '}
+          </Text>
+            <Animated.Text
+              style={[styles.momentsCounterNumberText, { transform: [{
+                scale: this.momentCountGrowValue
+              }]}]}
+            >
+              {this.props.momentCount}
+            </Animated.Text>
+        </View>
+        <View style={styles.momentShopContainer}>
+          <TouchableOpacity onPress={Actions.storePage}>
+            <Image
+              style={styles.momentShopImage}
+              source={momentShop}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  render() {
+    return (
+      <View style={styles.topLevelContainer}>
+        {this.renderTopMessage()}
+        {this.renderLive()}
+        {this.renderBottomBar()}
+        <MessageBarAlert ref="alert"/>
+      </View>
+    );
+  }
 
 }
 
 Object.assign(MainPage.prototype, TimerMixin);
 
+function mapStateToProps(state) {
+  return { momentCount: state.count };
+}
+
 function mapDispatchToProps(dispatch) {
   return { actions: bindActionCreators(actions, dispatch) };
 }
 
-export default connect(null, mapDispatchToProps)(MainPage);
+export default connect(mapStateToProps, mapDispatchToProps)(MainPage);
