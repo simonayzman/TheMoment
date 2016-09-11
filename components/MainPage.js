@@ -20,8 +20,6 @@ import keyMirror from 'keymirror';
 import { Actions } from 'react-native-router-flux';
 import * as Animatable from 'react-native-animatable';
 import TimerMixin from 'react-timer-mixin';
-var MessageBarAlert = require('react-native-message-bar').MessageBar;
-var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -33,17 +31,12 @@ import getRandomDontThink from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
 
-const VIBRATION_INTERVAL = 5000;
-const LIVE_INTERVAL = 1000;
+const VIBRATION_INTERVAL = 8000;
+const LIVE_INTERVAL = 3000;
 
 import {main_page_styles} from "../lib/styles"
 const styles = main_page_styles
 
-
-const TopMessageType = keyMirror({
-  WELCOME: null,
-  DONT_THINK: null,
-});
 
 class MainPage extends Component {
   static propTypes = {
@@ -59,7 +52,7 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      topMessageType: TopMessageType.WELCOME,
+
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
       isReady: true,
@@ -75,13 +68,9 @@ class MainPage extends Component {
   componentWillReceiveProps(props) {
     const { momentCount } = props;
     LayoutAnimation.spring();
-    // TODO move to reducer
     // Rules for annoying stuff
     if (momentCount == 0) {
       return;
-    }
-    if (momentCount === 1) {
-      this.setState({achievement_title:"Your First Moment", achievement_message:"You're well on your way to living in The Moment"})
     }
     if (momentCount % 3 == 0) {
       this.setState({
@@ -101,11 +90,10 @@ class MainPage extends Component {
   }
 
   componentWillUnmount() {
-    // MessageBarManager.unregisterMessageBar();
+    this.clearTimeout(this.resetReadyTimeoutID)
   }
 
   componentDidMount() {
-    // MessageBarManager.registerMessageBar(this.refs.alert);
     this.props.actions.updateMomentsFromCache();
     this.scheduleNoLivingVibration();
   }
@@ -263,7 +251,7 @@ class MainPage extends Component {
           {this.renderLive()}
           {this.renderBottomBar()}
         </View>
-        <MessageBarAlert ref="alert"/>
+
       </View>
     );
   }
