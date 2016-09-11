@@ -22,11 +22,11 @@ var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from './actions';
+import * as actions from '../redux/actions';
 
-import momentShop from './assets/moment-shop.png';
-import getRandomDontThink from './dontThink';
-import getAchievementForMomentCount from './achievements';
+import momentShop from '../assets/moment-shop.png';
+import getRandomDontThink from '../data/dontThink';
+import getAchievementForMomentCount from '../data/achievements';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;

@@ -1,5 +1,5 @@
-import MomentCache from './MomentCache';
-import constants from './constants';
+import MomentCache from '../lib/MomentCache';
+import constants from '../lib/constants';
 const {
   UPDATE_MOMENTS_FROM_CACHE,
   LIVE_IN_THE_MOMENT,

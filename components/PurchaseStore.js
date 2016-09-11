@@ -13,22 +13,22 @@ const purchasables  = [
   {
     description: "Something Cool",
     price: 100,
-    image: require('./assets/clock.png')
+    image: require('../assets/clock.png')
   },
   {
     description: "Hyper Mode",
     price: 300,
-    image: require('./assets/stuff.png')
+    image: require('../assets/stuff.png')
   },
   {
     description: "Disable Social",
     price: 400,
-    image: require('./assets/stuff.png')
+    image: require('../assets/stuff.png')
   },
   {
     description: "Premium Green Live Button",
     price: 500,
-    image: require('./assets/stuff.png')
+    image: require('../assets/stuff.png')
   },
 ]
 

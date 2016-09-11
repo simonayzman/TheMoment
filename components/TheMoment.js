@@ -10,7 +10,7 @@ import {
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from './actions';
+import * as actions from '../redux/actions';
 
 import MainPage from './MainPage';
 import PurchaseStore from './PurchaseStore';
