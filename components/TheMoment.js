@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../redux/actions';
 
+import IntroPage from './IntroPage';
 import MainPage from './MainPage';
 import PurchaseStore from './PurchaseStore';
 
@@ -23,7 +24,8 @@ class TheMoment extends Component {
     return (
       <RouterWithRedux>
         <Scene key="root">
-          <Scene key={'mainPage'} component={MainPage} title='Live in the Moment!' hideNavBar initial/>
+          <Scene key={'introPage'} component={IntroPage} title='Live in the Moment!' hideNavBar />
+          <Scene key={'mainPage'} component={MainPage} title='Live in the Moment!' hideNavBar  initial />
           <Scene key={'storePage'} component={PurchaseStore} title="Shop in the Moment!" hideNavBar={false} />
         </Scene>
       </RouterWithRedux>
