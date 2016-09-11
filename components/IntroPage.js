@@ -56,7 +56,6 @@ export default class IntroPage extends Component {
         <View style={styles.bgwrap}><Image source={require('../assets/bg.jpg')} style={styles.bg} /></View>
         <View style={styles.container}>
           <Text style={styles.h1}>THE MOMENT</Text>
-          <Text style={styles.h2}>-</Text>
           <Text style={styles.h2}>LIVE IN THE MOMENT</Text>
           <TouchableOpacity onPress={Actions.mainPage}><Text style={styles.button}>GET STARTED</Text></TouchableOpacity>
         </View>

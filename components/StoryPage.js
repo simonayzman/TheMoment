@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   Image,
   TouchableOpacity,
   Modal,
@@ -11,19 +12,19 @@ import {
 
 const stories = [
   {
-    description: "Living in the moment!",
+    description: "Living in the moment! Thanks Tide!",
     image: require('../assets/stories/surfing.png'),
     timePassed: "7m",
     name:"Sarah G.",
   },
   {
-    description: "#livinginthemoment",
+    description: "Living in the moment! Thanks Tide!",
     image: require('../assets/stories/wedding.png'),
     timePassed: "2h",
     name:"Kim S.",
   },
   {
-    description: "Never been more present! #litm",
+    description: "Living in the moment! Thanks Tide!",
     image: require('../assets/stories/beach.png'),
     timePassed: "6h",
     name:"Jess H.",
@@ -82,7 +83,7 @@ export default class StoryPage extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
 
         <View style={styles.title}>
           <Text style={styles.h2}>
@@ -92,7 +93,7 @@ export default class StoryPage extends Component {
 
         {stories.map((item, i)=> {
           return(
-            <TouchableOpacity>
+            <TouchableOpacity key={i}>
               <Image style={styles.image} source={item.image} />
               <View style={styles.row}>
                 <Text style={styles.description}>&rdquo;{item.description}&rdquo;</Text>
@@ -102,7 +103,7 @@ export default class StoryPage extends Component {
             </TouchableOpacity>
           );
         })}
-      </View>
+      </ScrollView>
     );
   }
 }
