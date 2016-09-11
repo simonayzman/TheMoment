@@ -11,13 +11,12 @@ const initialState = {
   count: 0,
 };
 
-const errorHandler = (error) => {
-  console.log(error);
-}
-
 function updateMomentCount(momentCount) {
-  MomentCache.setItem('momentCount', momentCount, errorHandler);
-  return
+  MomentCache.setItem('momentCount', momentCount, (error) => {
+    if (error) {
+      console.log(error);
+    }
+  });
 }
 
 export default function moment(state = initialState, action) {
