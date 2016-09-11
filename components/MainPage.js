@@ -87,6 +87,9 @@ class MainPage extends Component {
         dontThink: getRandomDontThink(),
       });
     }
+    else {
+      this.setState({ dontThink: ''});
+    }
     let achievement = getAchievementForMomentCount(momentCount);
     if (achievement) {
       this.setState({achievement_title:achievement, achievement_message:`Congratulations on living in ${momentCount} moments!` })
@@ -160,17 +163,14 @@ class MainPage extends Component {
   }
 
 
-
-
-
   renderTopMessage() {
-    console.log('rendertop')
-    console.log(this.state)
-    // console.log(this.props.momentCount)
-    return (this.state.achievement_message ? <View style={styles.topMessageContainer}>
-        <Text style={styles.topMessageTitleText}>🏆{this.state.achievement_title}</Text>
+    let ach_bar = (this.state.achievement_message ? <View style={styles.topMessageContainer}>
+        <Text style={styles.topMessageTitleText}>🏆 {this.state.achievement_title}</Text>
         <Text style={styles.topMessageSubtitleText}>{this.state.achievement_message}</Text>
       </View> : <View></View>)
+    console.log(this.state.dontThink )
+    let dontThink = (this.state.dontThink ? <View style={{marginTop:50}}><Text style={styles.dontThinkAboutTitleText}>Don't think about {this.state.dontThink}</Text></View> : <View></View>)
+    return <View>{ach_bar}{dontThink}</View>
   }
 
   renderLive() {
