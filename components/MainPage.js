@@ -27,7 +27,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../redux/actions';
 
-import momentShop from '../assets/moment-shop.png';
+import momentShop from '../assets/cart-icon.png';
+import storyPage from '../assets/people-icon.png';
 import getRandomDontThink from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
@@ -169,7 +170,24 @@ class MainPage extends Component {
         <Text style={styles.topMessageSubtitleText}>{this.state.achievement_message}</Text>
       </View> : <View></View>)
     console.log(this.state.dontThink )
-    let dontThink = (this.state.dontThink ? <View style={{marginTop:50}}><Text style={styles.dontThinkAboutTitleText}>Don't think about {this.state.dontThink}</Text></View> : <View></View>)
+    var dontThink;
+    if(this.state.dontThink){
+      dontThink = (
+        <View style={styles.topMessageContainer}>
+          <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
+            DON&#8217;T THINK ABOUT
+          </Text>
+          <View style={styles.dontThinkAboutTitleView}></View>
+          <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
+            {this.state.dontThink.toUpperCase()}
+          </Text>
+        </View>
+      );
+    } else {
+      dontThink = (
+        <View></View>
+      );
+    }
     return <View>{ach_bar}{dontThink}</View>
   }
 
@@ -191,6 +209,18 @@ class MainPage extends Component {
   renderBottomBar() {
     return (
       <View style={styles.bottomBar}>
+        <View style={styles.momentShopContainer}>
+          <TouchableOpacity
+            onPress={Actions.storyPage}
+            onLongPress={this.props.actions.bulkAddMoments}
+            delayLongPress={1000}
+          >
+            <Image
+              style={styles.bottomBarImage}
+              source={storyPage}
+            />
+          </TouchableOpacity>
+        </View>
         <TouchableWithoutFeedback
           onLongPress={this.props.actions.resetMoments}
           delayLongPress={1000}
@@ -215,7 +245,7 @@ class MainPage extends Component {
             delayLongPress={1000}
           >
             <Image
-              style={styles.momentShopImage}
+              style={styles.bottomBarImage}
               source={momentShop}
             />
           </TouchableOpacity>
