@@ -128,6 +128,8 @@ class MainPage extends Component {
     momentCount: PropTypes.number.isRequired,
     actions: PropTypes.shape({
       liveInTheMoment: PropTypes.func.isRequired,
+      resetMoments: PropTypes.func.isRequired,
+      bulkAddMoments: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -257,10 +259,14 @@ class MainPage extends Component {
   renderBottomBar() {
     return (
       <View style={styles.bottomBar}>
-        <View style={styles.momentsCounterContainer}>
-          <Text style={styles.momentsCounterText}>
-            {'Moments: '}
-          </Text>
+        <TouchableWithoutFeedback
+          onLongPress={this.props.actions.resetMoments}
+          delayLongPress={1000}
+        >
+          <View style={styles.momentsCounterContainer}>
+            <Text style={styles.momentsCounterText}>
+              {'Moments: '}
+            </Text>
             <Animated.Text
               style={[styles.momentsCounterNumberText, { transform: [{
                 scale: this.momentCountGrowValue
@@ -268,9 +274,14 @@ class MainPage extends Component {
             >
               {this.props.momentCount}
             </Animated.Text>
-        </View>
+            </View>
+        </TouchableWithoutFeedback>
         <View style={styles.momentShopContainer}>
-          <TouchableOpacity onPress={Actions.storePage}>
+          <TouchableOpacity
+            onPress={Actions.storePage}
+            onLongPress={this.props.actions.bulkAddMoments}
+            delayLongPress={1000}
+          >
             <Image
               style={styles.momentShopImage}
               source={momentShop}
