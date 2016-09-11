@@ -12,28 +12,31 @@ import {
 import keyMirror from 'keymirror';
 
 const styles = StyleSheet.create({
-  achievementContainer: {
-    justifyContent: 'space-between',
-    padding: 8,
+  notificationContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: 80,
+    backgroundColor: 'red',
   },
   title: {
-    fontSize: 22,
+    fontSize: 30,
     fontFamily: 'IowanOldStyle-Bold',
     fontWeight: 'bold',
     color: 'white',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontFamily: 'IowanOldStyle-Bold',
     color: 'white',
   }
 });
 
-export default class AchievementNotification extends Component {
+export default class MomentNotification extends Component {
 
   static propTypes = {
     backgroundColor: PropTypes.string,
-    textColor: PropTypes.string
+    textColor: PropTypes.string,
     title: PropTypes.string.isRequired,
     subtitle: PropTypes.string,
     onPress: React.PropTypes.func,
@@ -52,26 +55,28 @@ export default class AchievementNotification extends Component {
       onMoveShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponderCapture: () => true,
       onShouldBlockNativeResponder: () => true,
+
       onPanResponderRelease: (evt, gestureState) => {
         if (gestureState.vy < 0) {
-          this.props.onDismiss();
+          console.log("dismissing");
+          if (this.props.onDismiss) {
+            this.props.onDismiss();
+          }
         }
       },
     });
   }
 
   render() {
-    const isBreaking = this.props.type === BREAKING;
-    const bgColor = isBreaking ? '#BA232B' : '#272A35';
     return (
       <View
-        style={[styles.container, { backgroundColor: this.props.backgroundColor }]}
+        style={[styles.notificationContainer, { backgroundColor: this.props.backgroundColor }]}
         {...this.panResponder.panHandlers}
       >
-        <Text>
+        <Text style={[styles.title, { color: this.props.textColor }]}>
           {this.props.title}
         </Text>
-        <Text style={styles.notification}>
+        <Text style={[styles.subtitle, { color: this.props.textColor }]}>
           {this.props.subtitle}
         </Text>
       </View>
