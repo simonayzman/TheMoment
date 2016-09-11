@@ -27,7 +27,7 @@ import * as actions from '../redux/actions';
 
 import momentShop from '../assets/cart-icon.png';
 import storyPage from '../assets/people-icon.png';
-import getRandomDontThink from '../data/dontThink';
+import {dontThinkList} from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
 
@@ -52,7 +52,7 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      dontThinkIndex: -1,
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
       isReady: true,
@@ -74,7 +74,8 @@ class MainPage extends Component {
     }
     if (momentCount % 3 == 0) {
       this.setState({
-        dontThink: getRandomDontThink(),
+        dontThinkIndex: this.state.dontThinkIndex+1,
+        dontThink: dontThinkList[this.state.dontThinkIndex+1],
       });
     }
     else {

@@ -1,11 +1,12 @@
-const dontThink = [
+export const dontThinkList = [
   'Rupert Murdoch',
   'Outliving your parents',
   'Daniel Radcliffe',
   'Bop It Extreme',
   'The Cosby thing',
   'Nepotism',
-  'Today’s date',
+  'The Trans-Pacific Partnership',
+  'Aleppo',
   'Space-time',
   'BENGHAZI',
   'The one that got away',
@@ -20,11 +21,9 @@ const dontThink = [
   'Who won the World Series in 2004, and how',
   'Charlie and the Chocolate Factory',
   'You’ll probably get cancer at some point',
-  'The Trans-Pacific Partnership',
   'Traffic on 38th St',
   'Imminent death',
   'AOL Instant Messenger',
-  'Aleppo',
   'Who let the dogs out?',
   'The cure to Saturday Night Fever',
   'Whether or not your co-workers like you',
@@ -36,5 +35,5 @@ const dontThink = [
 ];
 
 export default function getRandomDontThink() {
-  return dontThink[Math.floor(Math.random()*dontThink.length)];
+  return dontThinkList[Math.floor(Math.random()*dontThink.length)];
 }
