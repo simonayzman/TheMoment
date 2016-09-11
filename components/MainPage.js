@@ -12,6 +12,8 @@ import {
   Image,
   Vibration,
   Dimensions,
+  PushNotificationIOS,
+  LayoutAnimation,
 } from 'react-native';
 import keyMirror from 'keymirror';
 import { Actions } from 'react-native-router-flux';
@@ -28,10 +30,12 @@ import momentShop from '../assets/moment-shop.png';
 import getRandomDontThink from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
+import MomentNotification from './MomentNotification';
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const VIBRATION_INTERVAL = 10000;
-const LIVE_INTERVAL = 500;
+const VIBRATION_INTERVAL = 5000;
+const LIVE_INTERVAL = 1000;
 const LIVE_BUTTON_SIZE = 250;
 
 const styles = StyleSheet.create({
@@ -125,10 +129,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   momentShopImage: {
-    width: 50,
-    height: 50,
+    width: 65,
+    height: 65,
     padding: 5,
   },
+});
+
+const MomentNotificationType = keyMirror({
+  NONE: null,
+  COME_BACK: null,
+  ACHIEVEMENT_GREEN: null,
+  ACHIEVEMENT_ORANGE: null,
 });
 
 const TopMessageType = keyMirror({
@@ -151,6 +162,7 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      momentNotificationType: MomentNotificationType.NONE,
       topMessageType: TopMessageType.WELCOME,
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
@@ -160,13 +172,17 @@ class MainPage extends Component {
     this.momentCountGrowValue = new Animated.Value(1);
   }
 
-  componentDidMount() {
-    MessageBarManager.registerMessageBar(this.refs.alert);
-    this.props.actions.updateMomentsFromCache();
+  componentWillMount() {
+    PushNotificationIOS.addEventListener('register', this.onRegistered);
+    PushNotificationIOS.addEventListener('notification', this.onRemoteNotification);
+    PushNotificationIOS.addEventListener('localNotification', this.onLocalNotification);
+    PushNotificationIOS.requestPermissions();
+    PushNotificationIOS.cancelAllLocalNotifications();
   }
 
   componentWillReceiveProps(props) {
     const { momentCount } = props;
+    LayoutAnimation.spring();
 
     // Rules for annoying stuff
     if (momentCount == 0) {
@@ -189,16 +205,113 @@ class MainPage extends Component {
 
   componentWillUnmount() {
     MessageBarManager.unregisterMessageBar();
+    PushNotificationIOS.removeEventListener('register', this.onRegistered);
+    PushNotificationIOS.removeEventListener('notification', this.onRemoteNotification);
+    PushNotificationIOS.removeEventListener('localNotification', this.onLocalNotification);
+    console.log('Unmounting the main page. Scheduling push notification');
+    this.scheduleLiveInTheMomentNotification();
   }
 
-  onVibrationTimeout = () => {
+  componentDidMount() {
+    MessageBarManager.registerMessageBar(this.refs.alert);
+    this.props.actions.updateMomentsFromCache();
+    this.scheduleNoLivingVibration();
+  }
+
+  sendNotification = () => {
+    require('RCTDeviceEventEmitter').emit('remoteNotificationReceived', {
+      aps: {
+        alert: 'Sample notification',
+        badge: '+1',
+        sound: 'default',
+        category: 'REACT_NATIVE',
+      },
+    });
+  }
+
+  sendLocalNotification = () => {
+    require('RCTDeviceEventEmitter').emit('localNotificationReceived', {
+      aps: {
+        alert: 'Sample local notification',
+        badge: '+1',
+        sound: 'default',
+        category: 'REACT_NATIVE',
+      },
+    });
+  }
+
+  scheduleLiveInTheMomentNotification = () => {
+    PushNotificationIOS.scheduleLocalNotification({
+      fireDate: Date()+4000,
+      alertBody: 'You\'re not living in the Moment!',
+      alertAction: 'Live in the Moment',
+      soundName: 'default',
+      // category: ,
+      // userInfo: ,
+      applicationIconBadgeNumber: 0,
+    });
+  }
+
+  onRegistered = (deviceToken) => {
+    console.log("Device registered.");
+    /*
+    AlertIOS.alert(
+      'Registered For Remote Push',
+      `Device Token: ${deviceToken}`,
+      [
+        { text: 'Dismiss', onPress: null, }
+      ],
+    );
+    */
+  }
+
+  onRemoteNotification = (notification) => {
+    console.log("On remote notification.");
+    /*
+    AlertIOS.alert(
+      'Push Notification Received',
+      'Alert message: ' + notification.getMessage(),
+      [
+        {
+          text: 'Dismiss',
+          onPress: null,
+        },
+      ],
+    );
+    */
+  }
+
+  onLocalNotification = (notification) => {
+    console.log("On local notification.");
+    /*
+    AlertIOS.alert(
+      'Local Notification Received',
+      'Alert message: ' + notification.getMessage(),
+      [
+        {
+          text: 'Dismiss',
+          onPress: null,
+        },
+      ],
+    );
+    */
+  }
+
+  scheduleNoLivingVibration = () => {
     if (this.vibrateTimeoutID) {
-      this.clearTimeout(this.vibrateTimeoutID); // Clear previous timer that would fire request
+      this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
-    this.vibrateTimeoutID = this.setTimeout(Vibration.vibrate, VIBRATION_INTERVAL);
+    this.vibrateTimeoutID = this.setInterval(() => {
+      Vibration.vibrate(); 
+      MessageBarManager.showAlert({
+        title: "You're not living in the Moment!",
+        message: "LIVE IN THE MOMENT",
+        alertType: 'error', // Looks like how we want it
+      });
+    }, VIBRATION_INTERVAL);
   }
 
-  onResetReadyTimeout = () => {
+  resetReadyLiveCircle = () => {
     if (this.resetReadyTimeoutID) {
       this.clearTimeout(this.resetReadyTimeoutID); // Clear previous timer that would fire request
     }
@@ -209,11 +322,6 @@ class MainPage extends Component {
         isReady: true,
       });
     }, LIVE_INTERVAL);
-  }
-
-  onResetReadyLiveCircle = () => {
-    this.onVibrationTimeout();
-    this.onResetReadyTimeout();
     this.setState({
       liveCircleStyle: [styles.liveCircle, styles.notReadyLiveCircle],
       liveText: [styles.liveText, styles.notReadyLiveText],
@@ -227,33 +335,89 @@ class MainPage extends Component {
     ]).start();
   }
 
+  updateMomentCounter = () => {
+    Animated.sequence([
+      Animated.spring(this.momentCountGrowValue, { toValue: 1.2, friction: 1}),
+      Animated.spring(this.momentCountGrowValue, { toValue: 1, friction: 1}),
+    ]).start();
+  }
+
   liveInTheMoment = () => {
     if (this.state.isReady) {
-      Animated.sequence([
-        Animated.spring(this.momentCountGrowValue, { toValue: 1.2, friction: 1}),
-        Animated.spring(this.momentCountGrowValue, { toValue: 1, friction: 1}),
-      ]).start();
-      this.onResetReadyLiveCircle();
+      this.updateMomentCounter();
+      this.resetReadyLiveCircle();
+      this.scheduleNoLivingVibration();
       this.props.actions.liveInTheMoment();
     }
   }
 
   showFirstMomentAlert() {
+
     MessageBarManager.showAlert({
       title: 'Your first moment!',
       message: "You're well on your way to being in the moment.",
       alertType: 'success',
     });
-    this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
+    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
+    /*
+    this.setState({
+      momentNotificationType: MomentNotificationType.ACHIEVEMENT_GREEN,
+    });
+    */
   }
 
   showIntervalMomentsAlert(momentCount, achievement) {
+
     MessageBarManager.showAlert({
       title: `Congratulations on living in ${momentCount} moments!`,
       message: achievement,
-      alertType: 'warning',
+      alertType: 'warning', // Looks like how we want it
     });
-    this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
+    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
+    /*
+    this.setState({
+      momentNotificationType: MomentNotificationType.ACHIEVEMENT_ORANGE,
+    });
+    */
+  }
+
+  // Perhaps not necessary if we can get MessageBarManager working
+  renderMomentNotification() {
+    if (this.state.momentNotificationType === MomentNotificationType.NONE) {
+      return (
+        <View />
+      );
+    }
+    if (this.state.momentNotificationType === MomentNotificationType.COME_BACK) {
+      return (
+        <MomentNotification
+          backgroundColor={'red'}
+          textColor={'black'}
+          title={'Come back!'}
+          subtitle={"You're not living in the moment"}
+        />
+      );
+    }
+    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_GREEN) {
+      return (
+        <MomentNotification
+          backgroundColor={'green'}
+          textColor={'black'}
+          title={'Congratulations!'}
+          subtitle={`You've reached ${this.props.momentCount} moments!`}
+        />
+      );
+    }
+    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_ORANGE) {
+      return (
+        <MomentNotification
+          backgroundColor={'orange'}
+          textColor={'black'}
+          title={'Congratulations!'}
+          subtitle={`You've reached ${this.props.momentCount} moments!`}
+        />
+      );
+    }
   }
 
   renderTopMessage() {
@@ -336,10 +500,12 @@ class MainPage extends Component {
 
   render() {
     return (
-      <View style={styles.topLevelContainer}>
-        {this.renderTopMessage()}
-        {this.renderLive()}
-        {this.renderBottomBar()}
+      <View style={{flex: 1}}>
+        <View style={styles.topLevelContainer}>
+          {this.renderTopMessage()}
+          {this.renderLive()}
+          {this.renderBottomBar()}
+        </View>
         <MessageBarAlert ref="alert"/>
       </View>
     );
