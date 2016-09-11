@@ -14,6 +14,7 @@ import {
   Dimensions,
   PushNotificationIOS,
   LayoutAnimation,
+  Alert
 } from 'react-native';
 import keyMirror from 'keymirror';
 import { Actions } from 'react-native-router-flux';
@@ -30,7 +31,6 @@ import momentShop from '../assets/moment-shop.png';
 import getRandomDontThink from '../data/dontThink';
 import getAchievementForMomentCount from '../data/achievements';
 
-import MomentNotification from './MomentNotification';
 
 const VIBRATION_INTERVAL = 5000;
 const LIVE_INTERVAL = 1000;
@@ -38,12 +38,6 @@ const LIVE_INTERVAL = 1000;
 import {main_page_styles} from "../lib/styles"
 const styles = main_page_styles
 
-const MomentNotificationType = keyMirror({
-  NONE: null,
-  COME_BACK: null,
-  ACHIEVEMENT_GREEN: null,
-  ACHIEVEMENT_ORANGE: null,
-});
 
 const TopMessageType = keyMirror({
   WELCOME: null,
@@ -64,7 +58,6 @@ class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      momentNotificationType: MomentNotificationType.NONE,
       topMessageType: TopMessageType.WELCOME,
       liveCircleStyle: [styles.liveCircle, styles.readyLiveCircle],
       liveText: [styles.liveText, styles.readyLiveText],
@@ -81,7 +74,7 @@ class MainPage extends Component {
   componentWillReceiveProps(props) {
     const { momentCount } = props;
     LayoutAnimation.spring();
-
+    // TODO move to reducer
     // Rules for annoying stuff
     if (momentCount == 0) {
       return;
@@ -91,7 +84,6 @@ class MainPage extends Component {
     }
     if (momentCount % 3 == 0) {
       this.setState({
-        topMessageType: TopMessageType.DONT_THINK,
         dontThink: getRandomDontThink(),
       });
     }
@@ -102,12 +94,11 @@ class MainPage extends Component {
   }
 
   componentWillUnmount() {
-    MessageBarManager.unregisterMessageBar();
-
+    // MessageBarManager.unregisterMessageBar();
   }
 
   componentDidMount() {
-    MessageBarManager.registerMessageBar(this.refs.alert);
+    // MessageBarManager.registerMessageBar(this.refs.alert);
     this.props.actions.updateMomentsFromCache();
     this.scheduleNoLivingVibration();
   }
@@ -118,12 +109,10 @@ class MainPage extends Component {
       this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
     this.vibrateTimeoutID = this.setInterval(() => {
+      // only do this if we've already lived some moments
+      if (this.props.momentCount<4){return}
       Vibration.vibrate();
-      MessageBarManager.showAlert({
-        title: "You're not living in the Moment!",
-        message: "LIVE IN THE MOMENT",
-        alertType: 'error', // Looks like how we want it
-      });
+      Alert.alert('Live in The Moment!',  "You don't seem to be living in The Moment right now.")
     }, VIBRATION_INTERVAL);
   }
 
@@ -168,99 +157,59 @@ class MainPage extends Component {
   }
 
   showFirstMomentAlert() {
-
-    MessageBarManager.showAlert({
-      title: 'Your first moment!',
-      message: "You're well on your way to being in the moment.",
-      alertType: 'success',
-    });
-    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
-    /*
-    this.setState({
-      momentNotificationType: MomentNotificationType.ACHIEVEMENT_GREEN,
-    });
-    */
+    this.setState({achievement_message:"You're well on your way to being in The Moment."})
+    // MessageBarManager.showAlert({
+    //   duration: 4000,
+    //   title: 'Your first moment!',
+    //   message: "You're well on your way to being in the moment.",
+    //   position: 'bottom',
+    //   animationType: 'SlideFromLeft',
+    // });
   }
 
   showIntervalMomentsAlert(momentCount, achievement) {
-    MessageBarManager.showAlert({
-      title: `Congratulations on living in ${momentCount} moments!`,
-      message: achievement,
-      alertType: 'warning', // Looks like how we want it
-    });
+    this.setState({achievement_message:achievement})
+    // MessageBarManager.showAlert({
+    //   title: `Congratulations on living in ${momentCount} moments!`,
+    //   message: achievement,
+    //   alertType: 'warning', // Looks like how we want it
+    //   duration: 4000,
+    // });
 
-    //this.setTimeout(() => { MessageBarManager.hideAlert(); }, 2500);
-    /*
-    this.setState({
-      momentNotificationType: MomentNotificationType.ACHIEVEMENT_ORANGE,
-    });
-    */
+
   }
 
-  // Perhaps not necessary if we can get MessageBarManager working
-  renderMomentNotification() {
-    if (this.state.momentNotificationType === MomentNotificationType.NONE) {
-      return (
-        <View />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.COME_BACK) {
-      return (
-        <MomentNotification
-          backgroundColor={'red'}
-          textColor={'black'}
-          title={'Come back!'}
-          subtitle={"You're not living in the moment"}
-        />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_GREEN) {
-      return (
-        <MomentNotification
-          backgroundColor={'green'}
-          textColor={'black'}
-          title={'Congratulations!'}
-          subtitle={`You've reached ${this.props.momentCount} moments!`}
-        />
-      );
-    }
-    if (this.state.momentNotificationType === MomentNotificationType.ACHIEVEMENT_ORANGE) {
-      return (
-        <MomentNotification
-          backgroundColor={'orange'}
-          textColor={'black'}
-          title={'Congratulations!'}
-          subtitle={`You've reached ${this.props.momentCount} moments!`}
-        />
-      );
-    }
-  }
+
 
   renderTopMessage() {
-    if (this.state.topMessageType === TopMessageType.WELCOME) {
-      return (
-        <View style={styles.topMessageContainer}>
-          <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
-            Welcome to
-          </Text>
-          <Text style={[styles.topMessageSubtitleText, styles.welcomeMessageText]}>
-            THE MOMENT
-          </Text>
-        </View>
-      );
-    }
-    else if (this.state.topMessageType === TopMessageType.DONT_THINK) {
-      return (
-        <View style={styles.topMessageContainer}>
-          <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
-            {"Don't Think About"}
-          </Text>
-          <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
-            {this.state.dontThink}
-          </Text>
-        </View>
-      );
-    }
+    console.log(this.props.momentCount)
+    return (<View>
+        <Text>{this.state.achievement_message}</Text>
+      </View>)
+    // if (this.state.topMessageType === TopMessageType.WELCOME) {
+    //   return (
+    //     <View style={styles.topMessageContainer}>
+    //       <Text style={[styles.topMessageTitleText, styles.welcomeMessageText]}>
+    //         Welcome to
+    //       </Text>
+    //       <Text style={[styles.topMessageSubtitleText, styles.welcomeMessageText]}>
+    //         THE MOMENT
+    //       </Text>
+    //     </View>
+    //   );
+    // }
+    // else if (this.state.topMessageType === TopMessageType.DONT_THINK) {
+    //   return (
+    //     <View style={styles.topMessageContainer}>
+    //       <Text style={[styles.topMessageTitleText, styles.dontThinkAboutTitleText]}>
+    //         {"Don't Think About"}
+    //       </Text>
+    //       <Text style={[styles.topMessageSubtitleText, styles.dontThinkAboutSubtitleText]}>
+    //         {this.state.dontThink}
+    //       </Text>
+    //     </View>
+    //   );
+    // }
   }
 
   renderLive() {
