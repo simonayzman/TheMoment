@@ -34,7 +34,7 @@ import AdModal from './AdModal';
 
 const VIBRATION_INTERVAL = 9000;
 
-const LIVE_INTERVAL = 2000;
+const LIVE_INTERVAL = 3000;
 
 import { main_page_styles } from "../lib/styles"
 const styles = main_page_styles;
