@@ -80,18 +80,23 @@ const purchasables  = [
     purchased: false,
   },
   {
-    description: "Button V-Neck",
+    description: "Namaste Mode",
     price: 500,
     purchased: false,
   },
   {
-    description: "Namaste Mode",
+    description: "Button V-Neck",
     price: 1000,
     purchased: false,
   },
   {
-    description: "Privileged Mode",
+    description: "YOLO Mode",
     price: 5000,
+    purchased: false,
+  },
+  {
+    description: "Couple Mode",
+    price: 6900,
     purchased: false,
   },
 ];

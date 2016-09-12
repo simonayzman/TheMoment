@@ -154,13 +154,10 @@ class MainPage extends Component {
     if (this.vibrateTimeoutID) {
       this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
-    // Potentially only turn this on after two times? Condition wraps this block
-    // Use this.state.notLivingNotificationCount
     this.vibrateTimeoutID = this.setInterval(
       () => {
         // only do this if we've already lived some moments
-        if (this.props.momentCount > 4)
-        {
+        if (this.props.momentCount > 4 && this.state.notLivingNotificationCount < 2) {
           Vibration.vibrate();
           Alert.alert(
             'Live in The Moment!',
