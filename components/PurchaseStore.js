@@ -61,32 +61,37 @@ const styles = StyleSheet.create({
 const purchasables  = [
   {
     description: "Luxury Button",
-    price: 200,
-    purchased: false,
-  },
-  {
-    description: "Namaste Mode",
-    price: 300,
-    purchased: false,
-  },
-  {
-    description: "Beach Soundscape",
-    price: 900,
-    purchased: false,
-  },
-  {
-    description: "Button V-Neck",
-    price: 1000,
+    price: 15,
     purchased: false,
   },
   {
     description: "Countdown Timer",
-    price: 1000,
+    price: 50,
     purchased: false,
   },
   {
     description: "Enlightenment Mode",
-    price: 10000,
+    price: 100,
+    purchased: false,
+  },
+  {
+    description: "Beach Soundscape",
+    price: 250,
+    purchased: false,
+  },
+  {
+    description: "Button V-Neck",
+    price: 500,
+    purchased: false,
+  },
+  {
+    description: "Namaste Mode",
+    price: 1000,
+    purchased: false,
+  },
+  {
+    description: "Privileged Mode",
+    price: 5000,
     purchased: false,
   },
 ];
