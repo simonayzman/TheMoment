@@ -57,7 +57,7 @@ class MainPage extends Component {
     this.state = {
       isReady: true,
       liveButtonStyle: this.getLiveButtonStyle(true),   // [styles.liveButton, styles.readyLiveButton],
-      liveText: this.getLiveTextStyle(true),            // [styles.liveText, styles.readyLiveText],
+      liveTextStyle: this.getLiveTextStyle(true),            // [styles.liveText, styles.readyLiveText],
       shouldAdDisplay: false,
       dontThinkIndex: -1,
       notLivingNotificationCount: 0,
@@ -181,7 +181,7 @@ class MainPage extends Component {
       () => {
         this.setState({
           liveButtonStyle: this.getLiveButtonStyle(true),   // [styles.liveButton, styles.readyLiveButton],
-          liveText: this.getLiveTextStyle(true),            // [styles.liveText, styles.readyLiveText],
+          liveTextStyle: this.getLiveTextStyle(true),            // [styles.liveText, styles.readyLiveText],
           isReady: true,
         });
       },
@@ -189,7 +189,7 @@ class MainPage extends Component {
     );
     this.setState({
       liveButtonStyle: this.getLiveButtonStyle(false),    // [styles.liveButton, styles.notReadyLiveButton],
-      liveText: this.getLiveTextStyle(false),             // [styles.liveText, styles.notReadyLiveText],
+      liveTextStyle: this.getLiveTextStyle(false),             // [styles.liveText, styles.notReadyLiveText],
       isReady: false,
     });
     Animated.sequence([
@@ -249,7 +249,7 @@ class MainPage extends Component {
               scale: this.liveGrowValue
             }]}]}
           >
-            <Text style={this.state.liveText}>LIVE</Text>
+            <Text style={this.state.liveTextStyle}>LIVE</Text>
           </Animated.View>
         </TouchableOpacity>
       </View>
