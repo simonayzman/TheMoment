@@ -95,8 +95,9 @@ class MainPage extends Component {
 
     // The first ad appears after 9 moments, and then every 6 thereafter
     let shouldAdDisplay =
-      (momentCount === 9) ||
-      (momentCount > 9 && (momentCount - 9) % 6 === 0);
+      (momentCount === 8) ||
+      (momentCount === 16) ||
+      (momentCount > 16 && (momentCount - 16) % 6 === 0);
     this.setState({ shouldAdDisplay });
   }
 
