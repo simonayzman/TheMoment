@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
   adImage: {
     margin: IMAGE_MARGIN,
     width: SCREEN_WIDTH - IMAGE_MARGIN * 2,
+    height: SCREEN_WIDTH - IMAGE_MARGIN * 2,
     alignSelf: 'center',
   },
   cancelButtonView: {
