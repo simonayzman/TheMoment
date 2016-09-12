@@ -99,17 +99,22 @@ const purchasables  = [
 class PurchaseStore extends Component {
 
   static propTypes = {
+    purchasables: PropTypes.arrayOf(PropTypes.objects),
     actions: PropTypes.shape({
       purchaseLuxuryLiveButton: PropTypes.func.isRequired,
     }).isRequired,
   };
 
+  constructor() {
+    super();
+    this.state = { purchasables };
+  }
+
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  onPressStoreItem(event, item){
-    console.log('PRESSED', event, item);
+  onPressStoreItem(item){
     if (item.description === 'Luxury Button' && !item.purchased) {
       this.props.actions.purchaseLuxuryLiveButton(item.price);
       for (let purchasableItem of purchasables) {
@@ -122,33 +127,37 @@ class PurchaseStore extends Component {
     }
   }
 
+  renderStoreItems() {
+    return this.state.purchasables.map(
+      (item, i) => {
+        let price = this.numberWithCommas(item.price);
+        if (item.purchased) {
+          price = 'Purchased!';
+        }
+        return (
+          <TouchableOpacity
+            key={i}
+            style={styles.row}
+            onPress={() => this.onPressStoreItem(item)}
+          >
+            <Image style={styles.image} source={item.image} />
+            <Text style={styles.description}>{item.description.toUpperCase()}</Text>
+            <Text style={styles.price}>{price}</Text>
+          </TouchableOpacity>
+        );
+      }
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
-
         <View style={styles.title}>
           <Text style={styles.h2}>
             {'Store'.toUpperCase()}
           </Text>
         </View>
-
-        {purchasables.map((item, i)=> {
-          let price = this.numberWithCommas(item.price);
-          if (item.purchased) {
-            price = 'Purchased!';
-          }
-          return(
-            <TouchableOpacity
-              key={i}
-              style={styles.row}
-              onPress={(event) => this.onPressStoreItem(event, item)}
-            >
-              <Image style={styles.image} source={item.image} />
-              <Text style={styles.description}>{item.description.toUpperCase()}</Text>
-              <Text style={styles.price}>{price}</Text>
-            </TouchableOpacity>
-          );
-        })}
+        {this.renderStoreItems()}
       </View>
     );
   }
