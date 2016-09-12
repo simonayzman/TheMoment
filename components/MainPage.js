@@ -305,7 +305,6 @@ class MainPage extends Component {
   }
 
   render() {
-    console.log("rendering");
     return (
       <View style={{flex: 1}}>
         <View style={styles.bgwrap}>

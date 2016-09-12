@@ -10,27 +10,6 @@ import {
   Modal,
 } from 'react-native';
 
-const stories = [
-  {
-    description: "Living in the moment! Thanks Tide!",
-    image: require('../assets/stories/surfing.png'),
-    timePassed: "7m",
-    name:"Sarah G.",
-  },
-  {
-    description: "Living in the moment! Thanks Tide!",
-    image: require('../assets/stories/wedding.png'),
-    timePassed: "2h",
-    name:"Kim S.",
-  },
-  {
-    description: "Living in the moment! Thanks Tide!",
-    image: require('../assets/stories/beach.png'),
-    timePassed: "6h",
-    name:"Jess H.",
-  },
-]
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -77,10 +56,28 @@ const styles = StyleSheet.create({
   }
 });
 
+const stories = [
+  {
+    description: "Living in the moment! Thanks Tide!",
+    image: require('../assets/stories/surfing.png'),
+    timePassed: "7m",
+    name:"Sarah G.",
+  },
+  {
+    description: "Living in the moment! Thanks Tide!",
+    image: require('../assets/stories/wedding.png'),
+    timePassed: "2h",
+    name:"Kim S.",
+  },
+  {
+    description: "Living in the moment! Thanks Tide!",
+    image: require('../assets/stories/beach.png'),
+    timePassed: "6h",
+    name:"Jess H.",
+  },
+];
+
 export default class StoryPage extends Component {
-  onPress(e, item){
-    console.log('PRESSED',e, item)
-  }
   render() {
     return (
       <ScrollView style={styles.container}>
