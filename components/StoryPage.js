@@ -58,49 +58,49 @@ const styles = StyleSheet.create({
 
 const stories = [
   {
-    description: "Living in the moment! Thanks Tide!",
+    description: "Living in The Moment™! Thanks Tide!",
     image: require('../assets/stories/surfing.png'),
     timePassed: "7m",
     name:"Sarah G.",
   },
   {
-    description: "Living in the moment! Thanks Raid!",
+    description: "Living in The Moment™! Thanks Raid!",
     image: require('../assets/stories/wedding.png'),
     timePassed: "2h",
     name:"Kim S.",
   },
   {
-    description: "Living in the moment! Thanks Miralax!",
+    description: "Living in The Moment™! Thanks Miralax!",
     image: require('../assets/stories/hillary.jpg'),
     timePassed: "6h",
     name:"Hill C.",
   },
   {
-    description: "Living in the moment! Thanks Tropicana!",
+    description: "Living in The Moment™! Thanks Tropicana!",
     image: require('../assets/stories/beach.png'),
     timePassed: "13h",
     name:"Jenny L.",
   },
   {
-    description: "Living in the moment! Thanks Viagra!",
+    description: "Living in The Moment™! Thanks Viagra!",
     image: require('../assets/stories/bed.jpg'),
     timePassed: "14h",
     name:"Mark M.",
   },
   {
-    description: "Living in the moment! Thanks Tide!",
+    description: "Living in The Moment™! Thanks Tide!",
     image: require('../assets/stories/pilot.jpg'),
     timePassed: "1d",
     name:"Bob B.",
   },
   {
-    description: "Living in the moment! Thanks Tropicana!",
+    description: "Living in The Moment™! Thanks Tropicana!",
     image: require('../assets/stories/bus.jpg'),
     timePassed: "1d",
     name:"Jess H.",
   },
   {
-    description: "Living in the moment! Thanks Miralax!",
+    description: "Living in The Moment™! Thanks Miralax!",
     image: require('../assets/stories/students.jpg'),
     timePassed: "1d",
     name:"John S.",
