@@ -10,6 +10,7 @@ import {
   Image,
   TouchableOpacity,
   Modal,
+  ScrollView,
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -156,14 +157,14 @@ class PurchaseStore extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.title}>
           <Text style={styles.h2}>
             {'Store'.toUpperCase()}
           </Text>
         </View>
         {this.renderStoreItems()}
-      </View>
+      </ScrollView>
     );
   }
 
