@@ -32,10 +32,9 @@ import getAchievementForMomentCount from '../data/achievements';
 
 import AdModal from './AdModal';
 
-const VIBRATION_INTERVAL = 8000;
+const VIBRATION_INTERVAL = 9000;
 
-const LIVE_INTERVAL = 3000;
-
+const LIVE_INTERVAL = 2000;
 
 import { main_page_styles } from "../lib/styles"
 const styles = main_page_styles;
@@ -67,36 +66,38 @@ class MainPage extends Component {
     this.momentCountGrowValue = new Animated.Value(1);
   }
 
-  componentWillMount() {
-
-  }
-
   componentWillReceiveProps(props) {
     const { momentCount } = props;
     LayoutAnimation.spring();
-    // Rules for annoying stuff
+
+    // When starting out, ignore stuff
     if (momentCount === 0) {
       return;
     }
+
+    // Every three moments, give em something to not think about
     if (momentCount % 3 == 0) {
       this.setState({
         dontThinkIndex: this.state.dontThinkIndex+1,
         dontThink: dontThinkList[this.state.dontThinkIndex+1],
       });
-    }
-    else {
+    } else {  // reset otherwise so the don't think message disappears
       this.setState({ dontThink: ''});
     }
+
+    // Roughly every 5 achievements, you get a top notification indicating so
     let achievement = getAchievementForMomentCount(momentCount);
     if (achievement) {
-      this.setState({achievement_title:achievement, achievement_message:`Congratulations on living in ${momentCount} moments!` })
+      this.setState({ achievement_title: achievement, achievement_message: `Congratulations on living in ${momentCount} moments!` })
+    } else if (momentCount > 1) { // confused about this
+      this.setState({ achievement_message:'', achievement_title:'' })
     }
-    else if (momentCount>1) {
-      this.setState({achievement_message:'', achievement_title:'' })
-    }
-    this.setState({
-      shouldAdDisplay: momentCount % 8 === 0,
-    });
+
+    // The first ad appears after 9 moments, and then every 6 thereafter
+    let shouldAdDisplay =
+      (momentCount === 9) ||
+      (momentCount > 9 && (momentCount - 9) % 6 === 0);
+    this.setState({ shouldAdDisplay });
   }
 
   componentWillUnmount() {
@@ -152,12 +153,23 @@ class MainPage extends Component {
     if (this.vibrateTimeoutID) {
       this.clearInterval(this.vibrateTimeoutID); // Clear previous timer that would fire request
     }
-    this.vibrateTimeoutID = this.setInterval(() => {
-      // only do this if we've already lived some moments
-      if (this.props.momentCount<4){return}
-      Vibration.vibrate();
-      Alert.alert('Live in The Moment!',  "You don't seem to be living in The Moment right now.")
-    }, VIBRATION_INTERVAL);
+    // Potentially only turn this on after two times? Condition wraps this block
+    // Use this.state.notLivingNotificationCount
+    this.vibrateTimeoutID = this.setInterval(
+      () => {
+        // only do this if we've already lived some moments
+        if (this.props.momentCount > 4)
+        {
+          Vibration.vibrate();
+          Alert.alert(
+            'Live in The Moment!',
+            "You don't seem to be living in The Moment right now."
+          );
+          this.setState({ notLivingNotificationCount: this.state.notLivingNotificationCount+1 })
+        }
+      },
+      VIBRATION_INTERVAL
+    );
   }
 
   resetReadyLiveButton = () => {
@@ -178,7 +190,6 @@ class MainPage extends Component {
       liveButtonStyle: this.getLiveButtonStyle(false),    // [styles.liveButton, styles.notReadyLiveButton],
       liveText: this.getLiveTextStyle(false),             // [styles.liveText, styles.notReadyLiveText],
       isReady: false,
-      start: false,
     });
     Animated.sequence([
       Animated.spring(this.liveGrowValue, { toValue: 0.7 }),
