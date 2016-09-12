@@ -69,7 +69,7 @@ export default class MomentNotification extends Component {
   constructor() {
     super();
     this.state = {
-      currentAdIndex: 0,
+      currentAdIndex: -1,
     }
   }
 
