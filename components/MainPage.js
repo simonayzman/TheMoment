@@ -43,12 +43,13 @@ class MainPage extends Component {
 
   static propTypes = {
     momentCount: PropTypes.number.isRequired,
-    purchasedLuxuryLiveButton: PropTypes.bool.isRequired,
+    isLuxuryLiveButtonEnabled: PropTypes.bool.isRequired,
     actions: PropTypes.shape({
       updateMomentsFromCache: PropTypes.func.isRequired,
       liveInTheMoment: PropTypes.func.isRequired,
       resetMoments: PropTypes.func.isRequired,
       bulkAddMoments: PropTypes.func.isRequired,
+      decrementLuxuryLiveButtonLifespan: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -112,7 +113,7 @@ class MainPage extends Component {
 
   getLiveButtonStyle(ready) {
     let liveButtonStyle = [];
-    if (this.props.purchasedLuxuryLiveButton) {
+    if (this.props.isLuxuryLiveButtonEnabled) {
       liveButtonStyle.push(styles.luxuryLiveButton);
       if (ready) {
         liveButtonStyle.push(styles.readyLuxuryLiveButton)
@@ -132,7 +133,7 @@ class MainPage extends Component {
 
   getLiveTextStyle(ready) {
     let liveTextStyle = [];
-    if (this.props.purchasedLuxuryLiveButton) {
+    if (this.props.isLuxuryLiveButtonEnabled) {
       liveTextStyle.push(styles.luxuryLiveText);
       if (ready) {
         liveTextStyle.push(styles.readyLuxuryLiveText)
@@ -209,6 +210,9 @@ class MainPage extends Component {
       this.resetReadyLiveButton();
       this.scheduleNoLivingVibration();
       this.props.actions.liveInTheMoment();
+      if (this.props.isLuxuryLiveButtonEnabled) {
+        this.props.actions.decrementLuxuryLiveButtonLifespan();
+      }
     }
   }
 
@@ -327,7 +331,7 @@ Object.assign(MainPage.prototype, TimerMixin);
 function mapStateToProps(state) {
   return {
     momentCount: state.count,
-    purchasedLuxuryLiveButton: state.purchasedLuxuryLiveButton,
+    isLuxuryLiveButtonEnabled: state.isLuxuryLiveButtonEnabled,
   };
 }
 

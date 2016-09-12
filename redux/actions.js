@@ -6,6 +6,8 @@ const {
   RESET_MOMENTS,
   BULK_ADD_MOMENTS,
   PURCHASE_LUXURY_LIVE_BUTTON,
+  DECREMENT_LUXURY_LIVE_BUTTON_LIFESPAN,
+  DISABLE_LUXURY_LIVE_BUTTON,
 } = constants;
 
 function dispatchableActionCreator(type, actionData) {
@@ -39,4 +41,18 @@ export function bulkAddMoments() {
 
 export function purchaseLuxuryLiveButton(price) {
   return dispatchableActionCreator(PURCHASE_LUXURY_LIVE_BUTTON, { price });
+}
+
+export function decrementLuxuryLiveButtonLifespan() {
+  return (dispatch, getState) => {
+    const { luxuryLiveButtonLifespan } = getState();
+    dispatch(dispatchableActionCreator(DECREMENT_LUXURY_LIVE_BUTTON_LIFESPAN));
+    if (luxuryLiveButtonLifespan == 0) { // about to die
+      dispatch(disableLuxuryLiveButton());
+    }
+  };
+}
+
+export function disableLuxuryLiveButton() {
+  return dispatchableActionCreator(DISABLE_LUXURY_LIVE_BUTTON);
 }

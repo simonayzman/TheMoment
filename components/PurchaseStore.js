@@ -59,62 +59,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const purchasables  = [
-  {
-    description: "Luxury Button",
-    price: 15,
-    purchased: false,
-  },
-  {
-    description: "Countdown Timer",
-    price: 50,
-    purchased: false,
-  },
-  {
-    description: "Enlightenment Mode",
-    price: 100,
-    purchased: false,
-  },
-  {
-    description: "Beach Soundscape",
-    price: 250,
-    purchased: false,
-  },
-  {
-    description: "Namaste Mode",
-    price: 500,
-    purchased: false,
-  },
-  {
-    description: "Button V-Neck",
-    price: 1000,
-    purchased: false,
-  },
-  {
-    description: "YOLO Mode",
-    price: 5000,
-    purchased: false,
-  },
-  {
-    description: "Couple Mode",
-    price: 6900,
-    purchased: false,
-  },
-];
-
 class PurchaseStore extends Component {
 
   static propTypes = {
-    purchasables: PropTypes.arrayOf(PropTypes.objects),
+    isLuxuryLiveButtonPurchased: PropTypes.bool.isRequired,
+    purchasables: PropTypes.arrayOf(PropTypes.object).isRequired,
     actions: PropTypes.shape({
       purchaseLuxuryLiveButton: PropTypes.func.isRequired,
     }).isRequired,
   };
-
-  constructor() {
-    super();
-    this.state = { purchasables };
-  }
 
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -123,18 +76,11 @@ class PurchaseStore extends Component {
   onPressStoreItem(item){
     if (item.description === 'Luxury Button' && !item.purchased) {
       this.props.actions.purchaseLuxuryLiveButton(item.price);
-      for (let purchasableItem of purchasables) {
-        if (purchasableItem.description === item.description) {
-          purchasableItem.purchased = true;
-          this.forceUpdate();
-          break;
-        }
-      }
     }
   }
 
   renderStoreItems() {
-    return this.state.purchasables.map(
+    return this.props.purchasables.map(
       (item, i) => {
         let price = this.numberWithCommas(item.price);
         if (item.purchased) {
@@ -170,8 +116,15 @@ class PurchaseStore extends Component {
 
 }
 
+function mapStateToProps(state) {
+  return {
+    isLuxuryLiveButtonPurchased: state.isLuxuryLiveButtonEnabled,
+    purchasables: state.purchasables,
+  };
+}
+
 function mapDispatchToProps(dispatch) {
   return { actions: bindActionCreators(actions, dispatch) };
 }
 
-export default connect(null, mapDispatchToProps)(PurchaseStore);
+export default connect(mapStateToProps, mapDispatchToProps)(PurchaseStore);

@@ -6,11 +6,16 @@ const {
   RESET_MOMENTS,
   BULK_ADD_MOMENTS,
   PURCHASE_LUXURY_LIVE_BUTTON,
+  DECREMENT_LUXURY_LIVE_BUTTON_LIFESPAN,
+  DISABLE_LUXURY_LIVE_BUTTON,
 } = constants;
+import purchasables from '../data/purchasables';
 
 const initialState = {
   count: 0,
-  purchasedLuxuryLiveButton: false,
+  isLuxuryLiveButtonEnabled: false,
+  luxuryLiveButtonLifespan: 0,
+  purchasables,
 };
 
 function updateMomentCount(momentCount) {
@@ -44,10 +49,26 @@ export default function moment(state = initialState, action) {
       return { ...state, count: newMomentCount };
 
     case PURCHASE_LUXURY_LIVE_BUTTON:
+      const purchasedPurchasables = [ ...state.purchasables ];
+      purchasedPurchasables[0].purchased = true;
       return {
         ...state,
-        purchasedLuxuryLiveButton: true,
+        isLuxuryLiveButtonEnabled: true,
+        luxuryLiveButtonLifespan: 2,
         count: state.count - action.price,
+        purchasables: purchasedPurchasables,
+     };
+
+    case DECREMENT_LUXURY_LIVE_BUTTON_LIFESPAN:
+      return { ...state, luxuryLiveButtonLifespan: state.luxuryLiveButtonLifespan-1 };
+
+    case DISABLE_LUXURY_LIVE_BUTTON:
+      const disabledPurchasables = [ ...state.purchasables ];
+      disabledPurchasables[0].purchased = false;
+      return {
+        ...state,
+        isLuxuryLiveButtonEnabled: false,
+        purchasables: disabledPurchasables,
       };
 
     default:
