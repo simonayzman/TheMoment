@@ -5,10 +5,12 @@ const {
   LIVE_IN_THE_MOMENT,
   RESET_MOMENTS,
   BULK_ADD_MOMENTS,
+  PURCHASE_LUXURY_LIVE_BUTTON,
 } = constants;
 
 const initialState = {
   count: 0,
+  purchasedLuxuryLiveButton: false,
 };
 
 function updateMomentCount(momentCount) {
@@ -40,6 +42,13 @@ export default function moment(state = initialState, action) {
       newMomentCount = state.count+100;
       updateMomentCount(newMomentCount);
       return { ...state, count: newMomentCount };
+
+    case PURCHASE_LUXURY_LIVE_BUTTON:
+      return {
+        ...state,
+        purchasedLuxuryLiveButton: true,
+        count: state.count - action.price,
+      };
 
     default:
       return state;

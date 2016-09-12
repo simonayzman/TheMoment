@@ -5,6 +5,7 @@ const {
   LIVE_IN_THE_MOMENT,
   RESET_MOMENTS,
   BULK_ADD_MOMENTS,
+  PURCHASE_LUXURY_LIVE_BUTTON,
 } = constants;
 
 function dispatchableActionCreator(type, actionData) {
@@ -36,9 +37,6 @@ export function bulkAddMoments() {
   return dispatchableActionCreator(BULK_ADD_MOMENTS);
 }
 
-// example thunk usage
-export function exampleAction() {
-  return (dispatch, getState) => {
-    dispatch(dispatchableActionCreator("ANOTHER_ACTION"), { exampleData: 1});
-  };
+export function purchaseLuxuryLiveButton(price) {
+  return dispatchableActionCreator(PURCHASE_LUXURY_LIVE_BUTTON, { price });
 }
