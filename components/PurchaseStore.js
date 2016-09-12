@@ -1,4 +1,7 @@
-import React, { Component } from 'react';
+import React, {
+  Component,
+  PropTypes,
+} from 'react';
 import {
   AppRegistry,
   StyleSheet,
@@ -9,32 +12,9 @@ import {
   Modal,
 } from 'react-native';
 
-const purchasables  = [
-  {
-    description: "Luxury Button",
-    price: 200,
-  },
-  {
-    description: "Namaste Mode",
-    price: 300,
-  },
-  {
-    description: "Beach Soundscape",
-    price: 900,
-  },
-  {
-    description: "Button V-Neck",
-    price: 1000,
-  },
-  {
-    description: "Countdown Timer",
-    price: 1000,
-  },
-  {
-    description: "Enlightenment \n(Flashlight Mode)",
-    price: 10000,
-  },
-]
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as actions from '../redux/actions';
 
 const styles = StyleSheet.create({
   container: {
@@ -78,14 +58,65 @@ const styles = StyleSheet.create({
   },
 });
 
+const purchasables  = [
+  {
+    description: "Luxury Button",
+    price: 200,
+    purchased: false,
+  },
+  {
+    description: "Namaste Mode",
+    price: 300,
+    purchased: false,
+  },
+  {
+    description: "Beach Soundscape",
+    price: 900,
+    purchased: false,
+  },
+  {
+    description: "Button V-Neck",
+    price: 1000,
+    purchased: false,
+  },
+  {
+    description: "Countdown Timer",
+    price: 1000,
+    purchased: false,
+  },
+  {
+    description: "Enlightenment Mode",
+    price: 10000,
+    purchased: false,
+  },
+];
 
-export default class PurchaseStore extends Component {
+class PurchaseStore extends Component {
+
+  static propTypes = {
+    actions: PropTypes.shape({
+      purchaseLuxuryLiveButton: PropTypes.func.isRequired,
+    }).isRequired,
+  };
+
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
-  onPress(e, item){
-    console.log('PRESSED',e, item)
+
+  onPressStoreItem(event, item){
+    console.log('PRESSED', event, item);
+    if (item.description === 'Luxury Button' && !item.purchased) {
+      this.props.actions.purchaseLuxuryLiveButton(item.price);
+      for (let purchasableItem of purchasables) {
+        if (purchasableItem.description === item.description) {
+          purchasableItem.purchased = true;
+          this.forceUpdate();
+          break;
+        }
+      }
+    }
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -97,15 +128,30 @@ export default class PurchaseStore extends Component {
         </View>
 
         {purchasables.map((item, i)=> {
+          let price = this.numberWithCommas(item.price);
+          if (item.purchased) {
+            price = 'Purchased!';
+          }
           return(
-            <TouchableOpacity key={i} onPress={e=>this.onPress(e, item)} style={styles.row}>
+            <TouchableOpacity
+              key={i}
+              style={styles.row}
+              onPress={(event) => this.onPressStoreItem(event, item)}
+            >
               <Image style={styles.image} source={item.image} />
               <Text style={styles.description}>{item.description.toUpperCase()}</Text>
-              <Text style={styles.price}>{this.numberWithCommas(item.price)}</Text>
+              <Text style={styles.price}>{price}</Text>
             </TouchableOpacity>
           );
         })}
       </View>
     );
   }
+
 }
+
+function mapDispatchToProps(dispatch) {
+  return { actions: bindActionCreators(actions, dispatch) };
+}
+
+export default connect(null, mapDispatchToProps)(PurchaseStore);
